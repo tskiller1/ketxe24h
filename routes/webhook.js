@@ -438,14 +438,15 @@ router.post('/', (req, res) => {
 									Locations
 										.findOne({ _id: news.location_id })
 										.then(location => {
+											console.log(location)
 											var total_level = location.total_level + data.level;
 											var average_rate = total_level / location.total_news;
-											Locations
-												.findOneAndUpdate({ _id: location._id }, { total_level: total_level, average_rate: average_rate }, {})
-												.then(newlocation => {
-													sendTextMessage(sender, "Bạn có muốn gửi hình ảnh tại đây cho chúng tôi không?")
-													sendImageMessage(sender, news._id)
-												})
+											// Locations
+											// 	.findOneAndUpdate({ _id: location._id }, { total_level: total_level, average_rate: average_rate }, {})
+											// 	.then(newlocation => {
+											// 		sendTextMessage(sender, "Bạn có muốn gửi hình ảnh tại đây cho chúng tôi không?")
+											// 		sendImageMessage(sender, news._id)
+											// 	})
 										})
 										.catch(error => {
 											console.log(error)
