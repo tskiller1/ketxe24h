@@ -1,5 +1,5 @@
 module.exports = {
-    "database": "mongodb://localhost:27017/Test",
+    "database": "mongodb://localhost:27017/KetXe24H",
     // "database":"mongodb://tskiller1:0613630149a@ds225038.mlab.com:25038/ketxe24h",
     "app_secret": "tlcn-2014",
     "api_key": 'AIzaSyCL8C2wURzDuzgF8VRSZ8GOLG0YEBT07Ig',
