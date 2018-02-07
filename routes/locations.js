@@ -154,6 +154,7 @@ router.get("/:id", (req, res) => {
                         if (location.saves.indexOf(decode._id) !== -1) {
                             newLocation.isSave = true;
                         }
+                        console.log(JSON.stringify(newLocation))
                         return res.json(response.success({ location: location }))
                     } else {
                         return res.json(response.failure(405, "Can not find this location"))
