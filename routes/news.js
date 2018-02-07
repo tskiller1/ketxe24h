@@ -23,6 +23,7 @@ router.post("/like", (req, res) => {
         if (err) {
             return res.json(response.failure(405, "You do not have permission"));
         }
+        
         var user_id = decode._id;
         User
             .findOne({ _id: user_id })
