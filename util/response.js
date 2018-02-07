@@ -1,3 +1,5 @@
+var utilities = require("./utilities")
+
 function failure(code, message) {
     return {
         code: code,
@@ -10,7 +12,7 @@ function success(body) {
     return {
         code: 200,
         message: "Successfully",
-        body: body
+        body:body
     }
 }
 

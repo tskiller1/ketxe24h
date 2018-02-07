@@ -51,7 +51,7 @@ router.post("/login", (req, res) => {
                                     .findOneAndUpdate({ _id: user._id }, { token: token }, { new: true })
                                     .select({ __v: 0 })
                                     .then(user => {
-                                        return res.json(response.success({ user: user }))
+                                        return res.json(response.success(user))
                                     })
                                     .catch(error => {
                                         return res.json(response.failure(405, error.message))
@@ -63,7 +63,7 @@ router.post("/login", (req, res) => {
                     } else {
                         user = user.toObject();
                         user.fullname = userRecord.displayName;
-                        return res.json(response.success({ user: user }))
+                        return res.json(response.success(user))
                     }
                 })
         })
@@ -117,7 +117,7 @@ router.get("/:id", (req, res) => {
                     .auth()
                     .getUser(user.user_id)
                     .then(function (userRecord) {
-                        return res.json(response.success({ user: user }))
+                        return res.json(response.success(user))
                     })
                     .catch(error => {
                         return res.json(response.failure(405, error.message))

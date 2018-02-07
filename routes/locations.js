@@ -55,7 +55,7 @@ router.get("/", function (req, res) {
                     if (skip + locations.length != count) {
                         has_more_page = true;
                     }
-                    return res.json(response.successList({ locations: locations }, count, page, has_more_page))
+                    return res.json(response.successList(locations, count, page, has_more_page))
                 })
         })
         .catch(error => {
@@ -172,7 +172,8 @@ router.get("/:id", (req, res) => {
                 if (location) {
                     var newLocation = location.toObject();
                     newLocation.isSave = false;
-                    return res.json(response.success({ location: location }))
+                    // console.log(JSON.stringify(newLocation))
+                    return res.json(response.success(newLocation))
                 } else {
                     return res.json(response.failure(405, "Can not find this location"))
                 }

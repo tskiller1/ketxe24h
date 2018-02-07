@@ -185,7 +185,7 @@ router.get("/", (req, res) => {
                         if (skip + newsList.length != count) {
                             has_more_page = true;
                         }
-                        return res.json(response.successList({ news: newsList }, count, page, has_more_page))
+                        return res.json(response.successList(newsList, count, page, has_more_page))
                     })
             })
             .catch(error => {
@@ -233,7 +233,7 @@ router.get("/", (req, res) => {
                             if (skip + newsList.length != count) {
                                 has_more_page = true;
                             }
-                            return res.json(response.successList({ news: newsList }, count, page, has_more_page))
+                            return res.json(response.successList(newsList , count, page, has_more_page))
                         })
                 })
                 .catch(error => {
@@ -256,7 +256,7 @@ router.get("/:id", (req, res) => {
             select: 'total_news total_likes total_dislikes full_name'
         })
         .then(newsList => {
-            return res.json(response.success({ news: newsList }))
+            return res.json(response.success(newsList))
         })
         .catch(error => {
             return res.json(response.failure(405, error.message))

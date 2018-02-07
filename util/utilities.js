@@ -37,5 +37,5 @@ module.exports = {
     onLocationChanged: onLocationChanged,
     checkMagicNumbers: checkMagicNumbers,
     getDistance: getDistance,
-    deg2rad: deg2rad
+    deg2rad: deg2rad,
 }
