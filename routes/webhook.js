@@ -439,7 +439,7 @@ router.post('/', (req, res) => {
 										.findOne({ _id: news.location_id })
 										.then(location => {
 											var total_level = location.total_level + data.level;
-											var average_rate = total_level / total_news;
+											var average_rate = total_level / location.total_news;
 											Locations
 												.findOneAndUpdate({ _id: location._id }, { total_level: total_level, average_rate: average_rate }, {})
 												.then(newlocation => {
