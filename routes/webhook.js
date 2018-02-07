@@ -235,6 +235,7 @@ router.post('/', (req, res) => {
 							});
 						}
 						else {
+							console.log("1")
 							Locations
 								.find({})
 								.populate({
@@ -243,6 +244,7 @@ router.post('/', (req, res) => {
 								})
 								.select({ __v: 0 })
 								.then(locations => {
+									console.log("2")
 									var location = null;
 									for (var i in locations) {
 										if (utilities.getDistance(locations[i].latitude, locations[i].longitude, latitude, longitude) <= 50) {
@@ -250,6 +252,7 @@ router.post('/', (req, res) => {
 										}
 									}
 									if (location) {
+										console.log("3")
 										var payload = {
 											data: {
 												title: "Có vị trí kẹt xe mới",
@@ -272,6 +275,7 @@ router.post('/', (req, res) => {
 												$currentDate: { last_modify: true }
 											}, { new: true })
 											.then(location => {
+												console.log("4")
 												console.log(location)
 												let newNews = new News({
 													user_id: user._id,
@@ -313,7 +317,7 @@ router.post('/', (req, res) => {
 												sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =)")
 											})
 									} else {
-										console.log("lat: " + latitude + " long:" + longitude)
+										// console.log("lat: " + latitude + " long:" + longitude)
 										geocoder
 											.reverse({ lat: latitude, lon: longitude })
 											.then(function (result) {
