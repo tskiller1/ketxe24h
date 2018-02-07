@@ -300,7 +300,7 @@ router.post("/contribute", (req, res) => {
                                         lastest_image: file,
                                         status: true,
                                         current_level: level,
-                                        $currentDate: { last_modify: true }
+                                        last_modify: created_at
                                     }, { new: true })
                                     .then(location => {
                                         let newNews = new News({
