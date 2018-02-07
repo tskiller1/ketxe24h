@@ -196,6 +196,7 @@ router.get("/", (req, res) => {
             if (err) {
                 return res.json(response.failure(405, "You do not have permission"))
             }
+            
             News
                 .find({ location_id: location_id })
                 .populate({
