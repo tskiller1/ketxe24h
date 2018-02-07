@@ -289,42 +289,60 @@ router.post("/contribute", (req, res) => {
                                         tokens.push(location.saves[i].fcm_token)
                                     }
                                 }
-                                // console.log(tokens)
-                                let newNews = new News({
-                                    user_id: userID,
-                                    created_at: created_at,
-                                    level: level,
-                                    description: description,
-                                    url_image: file,
-                                    count_like: 0,
-                                    count_dislike: 0,
-                                    type: 1,
-                                    location_id: location._id,
-                                    likes: [],
-                                    dislikes: []
-                                })
-                                newNews
-                                    .save()
-                                    .then(news => {
-                                        utilities.onLocationChanged(req.socketIO, location)
-                                        if (tokens.length > 0) {
-                                            notification
-                                                .sendToDevice(tokens, payload)
-                                                .then(resp => {
-                                                    console.log(resp)
+                                var total_news = location.total_news + 1;
+                                var total_level = location.total_level + level;
+                                var average_rate = total_level / total_news;
+                                Locations
+                                    .findOneAndUpdate({ _id: location._id }, {
+                                        total_news: total_news,
+                                        total_level: total_level,
+                                        average_rate: average_rate,
+                                        lastest_image: file,
+                                        status: true,
+                                        current_level: level,
+                                        $currentDate: { last_modify: true }
+                                    }, { new: true })
+                                    .then(location => {
+                                        let newNews = new News({
+                                            user_id: userID,
+                                            created_at: created_at,
+                                            level: level,
+                                            description: description,
+                                            url_image: file,
+                                            count_like: 0,
+                                            count_dislike: 0,
+                                            type: 1,
+                                            location_id: location._id,
+                                            likes: [],
+                                            dislikes: []
+                                        })
+                                        newNews
+                                            .save()
+                                            .then(news => {
+                                                utilities.onLocationChanged(req.socketIO, location)
+                                                if (tokens.length > 0) {
+                                                    notification
+                                                        .sendToDevice(tokens, payload)
+                                                        .then(resp => {
+                                                            console.log(resp)
+                                                            return res.json(response.success({}))
+                                                        })
+                                                        .catch(error => {
+                                                            console.log(error.message)
+                                                            return res.json(response.success({}))
+                                                        })
+                                                } else {
                                                     return res.json(response.success({}))
-                                                })
-                                                .catch(error => {
-                                                    console.log(error.message)
-                                                    return res.json(response.success({}))
-                                                })
-                                        } else {
-                                            return res.json(response.success({}))
-                                        }
+                                                }
+                                            })
+                                            .catch(error => {
+                                                return res.json(response.failure(405, error.message))
+                                            })
                                     })
                                     .catch(error => {
                                         return res.json(response.failure(405, error.message))
                                     })
+                                // console.log(tokens)
                             } else {
                                 geocoder
                                     .reverse({ lat: latitude, lon: longitude })
@@ -350,9 +368,9 @@ router.post("/contribute", (req, res) => {
                                             latitude: latitude,
                                             longitude: longitude,
                                             total_news: 1,
-                                            total_levels: level,
+                                            total_level: level,
                                             stop_count: 0,
-                                            rate: level,
+                                            average_rate: level,
                                             lastest_image: file,
                                             status: true,
                                             current_level: level,

@@ -36,7 +36,7 @@ router.post("/login", (req, res) => {
                             total_likes: 0,
                             total_dislikes: 0,
                             status_login: 1,
-                            type:1
+                            type: 1
                         });
                         newUser.save()
                             .then(user => {
@@ -81,25 +81,26 @@ router.post("/logout", (req, res) => {
         if (err) {
             return res.json(response.failure(403, "You do not have permission"));
         }
-        req.admin
-            .auth()
-            .getUser(decode.user_id)
-            .then(function (userRecord) {
-                User
-                    .findOneAndUpdate({ user_id: userRecord.uid }, { $set: { status_login: 2 } }, { new: true })
-                    .then(user => {
-                        if (user) {
+        User
+            .findOneAndUpdate({ _id: decode._id }, { $set: { status_login: 2 } }, { new: true })
+            .then(user => {
+                if (user) {
+                    req.admin
+                        .auth()
+                        .getUser(user.user_id)
+                        .then(function (userRecord) {
                             return res.json(response.success({}))
-                        } else {
-                            return res.json(response.failure(405, "Can not find this user"))
-                        }
-                    }).catch(error => {
-                        return res.json(response.failure(405, error.message))
-                    })
-            })
-            .catch(function (error) {
+                        })
+                        .catch(function (error) {
+                            return res.json(response.failure(405, error.message))
+                        });
+                } else {
+                    return res.json(response.failure(405, "Can not find this user"))
+                }
+            }).catch(error => {
                 return res.json(response.failure(405, error.message))
-            });
+            })
+
     })
 })
 

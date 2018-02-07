@@ -7,7 +7,7 @@ const LocationsSchema = new mongoose.Schema({
     total_level: Number,
     total_news: Number,
     stop_count: Number,
-    rate: Number,
+    average_rate: Number,
     lastest_image: String,
     status: Boolean,
     current_level: Number,
