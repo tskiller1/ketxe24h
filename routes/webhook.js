@@ -185,7 +185,7 @@ router.post('/', (req, res) => {
 																latitude: latitude,
 																longitude: longitude,
 																total_news: 1,
-																total_levels: 0,
+																total_level: 0,
 																stop_count: 0,
 																rate: 0,
 																lastest_image: "",
