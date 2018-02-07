@@ -116,9 +116,9 @@ router.post('/', (req, res) => {
 													var total_news = location.total_news + 1;
 													Locations
 														.findOneAndUpdate({ _id: location._id }, {
-															total_news: total_news,
+															$inc: { total_news: 1 },
 															status: true,
-															last_modify: created_at
+															$currentDate: { last_modify: true }
 														}, { new: true })
 														.then(location => {
 															let newNews = new News({
@@ -268,14 +268,14 @@ router.post('/', (req, res) => {
 										// console.log(tokens)
 										Locations
 											.findOneAndUpdate({ _id: location._id }, {
-												total_news: total_news,
+												$inc: { total_news: 1 },
 												status: true,
-												last_modify: created_at
+												$currentDate: { last_modify: true }
 											}, { new: true })
 											.then(location => {
 												let newNews = new News({
 													user_id: user._id,
-													created_at: created_at,
+													$currentDate: { created_at: true },
 													level: 0,
 													description: "",
 													url_image: "",
