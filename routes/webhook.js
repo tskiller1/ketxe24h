@@ -266,35 +266,47 @@ router.post('/', (req, res) => {
 											}
 										}
 										// console.log(tokens)
-										let newNews = new News({
-											user_id: user._id,
-											created_at: created_at,
-											level: 0,
-											description: "",
-											url_image: "",
-											count_like: 0,
-											count_dislike: 0,
-											type: 2,
-											location_id: location._id,
-											likes: [],
-											dislikes: []
-										})
-										newNews
-											.save()
-											.then(news => {
-												utilities.onLocationChanged(req.socketIO, location)
-												if (tokens.length > 0) {
-													notification
-														.sendToDevice(tokens, payload)
-														.then(response => {
-															console.log(response)
+										Locations
+											.findOneAndUpdate({ _id: location._id }, {
+												total_news: total_news,
+												status: true,
+												last_modify: created_at
+											}, { new: true })
+											.then(location => {
+												let newNews = new News({
+													user_id: user._id,
+													created_at: created_at,
+													level: 0,
+													description: "",
+													url_image: "",
+													count_like: 0,
+													count_dislike: 0,
+													type: 2,
+													location_id: location._id,
+													likes: [],
+													dislikes: []
+												})
+												newNews
+													.save()
+													.then(news => {
+														utilities.onLocationChanged(req.socketIO, location)
+														if (tokens.length > 0) {
+															notification
+																.sendToDevice(tokens, payload)
+																.then(response => {
+																	console.log(response)
+																	sendTextMessage(sender, "Bạn có thể cho chúng tôi biết mức độ kẹt xe tại đây lúc này được không?")
+																	sendLevelMessage(sender, news._id)
+																})
+														} else {
 															sendTextMessage(sender, "Bạn có thể cho chúng tôi biết mức độ kẹt xe tại đây lúc này được không?")
 															sendLevelMessage(sender, news._id)
-														})
-												} else {
-													sendTextMessage(sender, "Bạn có thể cho chúng tôi biết mức độ kẹt xe tại đây lúc này được không?")
-													sendLevelMessage(sender, news._id)
-												}
+														}
+													})
+													.catch(error => {
+														console.log(error)
+														sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =)")
+													})
 											})
 											.catch(error => {
 												console.log(error)
