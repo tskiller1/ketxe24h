@@ -120,7 +120,7 @@ router.post("/uploadForNews", (req, res) => {
                             .sort('-_id')
                             .then(news => {
                                 if (!news) {
-                                    sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+                                    sendTextMessage(decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
                                     return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                                 }
                                 Locations
