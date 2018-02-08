@@ -107,7 +107,6 @@ router.post("/uploadForNews", (req, res) => {
                     }
                 }
                 else {
-                    console.log("true")
                     News
                         .findOneAndUpdate({ _id: decode.news_id }, { url_image: "/images/" + req.file.filename }, { news: true })
                         .then(news => {
@@ -118,6 +117,7 @@ router.post("/uploadForNews", (req, res) => {
                             Locations
                                 .findOneAndUpdate({ _id: news.location_id }, { lastest_image: "/images/" + req.file.filename }, { new: true })
                                 .then(location => {
+                                    console.log(location)
                                     sendTextMessage(res, decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
                                     // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                                 })
