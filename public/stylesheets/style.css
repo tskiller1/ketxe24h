@@ -1,5 +1,4 @@
 body {
-  text-align: center;
   margin-top: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
@@ -11,6 +10,10 @@ form button{
 }
 .image {
   margin-top: 30px;
+}
+
+.text{
+  text-align: center
 }
 
 h1{
