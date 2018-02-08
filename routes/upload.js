@@ -88,7 +88,8 @@ router.post("/uploadForNews", (req, res) => {
         }).single("file");
         upload(req, res, err => {
             if (err) {
-                return res.json(response.failure(405, err.message))
+                console.log(err)
+                return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
             }
             try {
                 var bitmap = fs
