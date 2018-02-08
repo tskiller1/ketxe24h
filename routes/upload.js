@@ -84,7 +84,6 @@ router.post("/uploadForNews", (req, res) => {
             return res.json(response.failure(405, "You do not have permission"))
         }
         console.log(decode)
-        var user_id = decode._id;
         var upload = Multer({
             storage: storage
         }).single("file");
@@ -112,15 +111,13 @@ router.post("/uploadForNews", (req, res) => {
                     .findOne({ user_id: decode.user_id })
                     .then(user => {
                         if (!user) {
-                            sendTextMessage(decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
                             return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                         }
                         News
-                            .findOneAndUpdate({ _id: decode.news_id, url_image: "" }, { url_image: "/images/" + req.file.filename }, { news: true })
+                            .findOneAndUpdate({ _id: decode.news_id }, { url_image: "/images/" + req.file.filename }, { news: true })
                             .sort('-_id')
                             .then(news => {
                                 if (!news) {
-                                    sendTextMessage(decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
                                     return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                                 }
                                 Locations
@@ -131,18 +128,17 @@ router.post("/uploadForNews", (req, res) => {
                                     })
                                     .catch(error => {
                                         console.log(error)
-                                        sendTextMessage(decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
                                         return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                                     })
                             })
                             .catch(error => {
                                 console.log(error)
-                                sendTextMessage(decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+                                return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                             })
                     })
                     .catch(error => {
                         console.log(error)
-                        sendTextMessage(decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+                        return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                     })
             } catch (err) {
                 return res.json(response.failure(405, err.message))
