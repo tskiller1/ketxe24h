@@ -67,25 +67,40 @@ router.get("/loadByDistance", (req, res) => {
     if (!req.query.latitude || !req.query.longitude || !req.query.distance) {
         return res.json(response.failure(404, "Not Found"));
     }
-    var latitude = req.query.latitude;
-    var longitude = req.query.longitude;
-    var distance = req.query.distance;
-    Locations
-        .find({ status: true })
-        .select({ __v: 0, saves: 0 })
-        .then(locations => {
-            var locationArray = []
-            for (var i in locations) {
-                if (utilities.getDistance(locations[i].latitude, locations[i].longitude, latitude, longitude) <= distance) {
-                    locationArray.push(locations[i]);
+    var latitude = parseFloat(req.query.latitude);
+    var longitude = parseFloat(req.query.longitude);
+    var distance = parseFloat(req.query.distance);
+    var point = {
+        type: "Point",
+        coordinates: [longitude, latitude]
+    }
+    Locations.aggregate(
+        [
+            {
+                $geoNear: {
+                    near: point,
+                    spherical: true,
+                    distanceField: "distance",
+                    maxDistance: distance
+                }
+            },
+            {
+                $project: {
+                    __v: 0,
+                    saves: 0
                 }
             }
-            return res.json(response.success({ locations: locationArray }))
-        })
-        .catch(error => {
-            return res.json(response.failure(405, error.message))
-        })
+        ],
+        function (err, locations) {
+            // do what you want with the results here
+            if (err) {
+                return res.json(response.failure(405, err.message))
+            }
+            return res.json(response.success(locations))
+        }
+    )
 })
+
 
 router.get("/save", (req, res) => {
     if (!req.query.token) {
@@ -246,7 +261,10 @@ router.post("/contribute", (req, res) => {
     var file = req.body.file;
     var description = req.body.description || "";
     var created_at = new Date().toISOString();
-
+    var point = {
+        type: "Point",
+        coordinates: [longitude, latitude]
+    }
     jwt.verify(token, config.app_secret, (err, decode) => {
         if (err) {
             return res.json(response.failure(403, "You do not have permission"));
@@ -260,21 +278,33 @@ router.post("/contribute", (req, res) => {
                     if (!user) {
                         return res.json(response.failure(403, "You do not have permission"));
                     }
-                    Locations
-                        .find({})
-                        .populate({
-                            path: "saves",
-                            select: "fcm_token"
-                        })
-                        .select({ __v: 0 })
-                        .then(locations => {
-                            var location = null
-                            for (var i in locations) {
-                                if (utilities.getDistance(locations[i].latitude, locations[i].longitude, latitude, longitude) <= 50) {
-                                    location = locations[i];
+                    Locations.aggregate(
+                        [
+                            {
+                                $geoNear: {
+                                    near: point,
+                                    spherical: true,
+                                    distanceField: 'distance',
+                                    maxDistance: 50
                                 }
+                            },
+                            {
+                                $lookup:
+                                    {
+                                        from: "users",
+                                        localField: "saves",
+                                        foreignField: "_id",
+                                        as: "saves"
+                                    }
                             }
-                            if (location) {
+                        ],
+                        function (err, locations) {
+                            // do what you want with the results here
+                            if (err) {
+                                return res.json(response.failure(405, error.message))
+                            }
+                            if (locations[0]) {
+                                var location = locations[0]
                                 var payload = {
                                     data: {
                                         title: "Có vị trí kẹt xe mới",
@@ -289,6 +319,7 @@ router.post("/contribute", (req, res) => {
                                         tokens.push(location.saves[i].fcm_token)
                                     }
                                 }
+                                console.log(location)
                                 var total_news = location.total_news + 1;
                                 var total_level = location.total_level + level;
                                 var average_rate = total_level / total_news;
@@ -339,10 +370,6 @@ router.post("/contribute", (req, res) => {
                                                 return res.json(response.failure(405, error.message))
                                             })
                                     })
-                                    .catch(error => {
-                                        return res.json(response.failure(405, error.message))
-                                    })
-                                // console.log(tokens)
                             } else {
                                 geocoder
                                     .reverse({ lat: latitude, lon: longitude })
@@ -365,8 +392,7 @@ router.post("/contribute", (req, res) => {
                                         }
                                         let newLocation = new Locations({
                                             title: title,
-                                            latitude: latitude,
-                                            longitude: longitude,
+                                            location: point,
                                             total_news: 1,
                                             total_level: level,
                                             stop_count: 0,
@@ -408,11 +434,8 @@ router.post("/contribute", (req, res) => {
                                             })
                                     });
                             }
-                        }).catch(error => {
-                            // if (!location || location == null) {
-                            console.log(error)
-                            return res.json(response.failure(405, error.message))
-                        })
+                        }
+                    )
                 })
         }
     })

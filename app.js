@@ -32,7 +32,7 @@ admin.initializeApp({
     uid: "mbN7Ny4xcpUINGSuqEnMJkJBi8t2"
   }
 });
-socketIO.on('connection', function(socket){
+socketIO.on('connection', function (socket) {
   console.log('A client connection occurred!');
 });
 // view engine setup
@@ -58,6 +58,7 @@ app.use('/locations', locations)
 app.use('/upload', upload)
 app.use('/chart', chart)
 app.use('/news', news)
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   var err = new Error('Not Found');
@@ -73,8 +74,8 @@ app.use(function (err, req, res, next) {
 
   // // render the error page
   // res.status(err.status || 500);
-  // res.render('error');
-  return res.json(response.failure(404, "Not Found"));
+  // res.end(err);
+  return res.json(response.failure(404, err.message));
 });
 
 module.exports = app;

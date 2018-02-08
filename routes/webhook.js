@@ -56,6 +56,10 @@ router.post('/', (req, res) => {
 				var longitude = payload.coordinates.long;
 				var userID = sender;
 				var created_at = new Date().toISOString();
+				var point = {
+					type: "Point",
+					coordinates: [longitude, latitude]
+				}
 				User
 					.findOne({ user_id: userID, type: 2 })
 					.then(user => {
@@ -82,21 +86,33 @@ router.post('/', (req, res) => {
 								});
 								newUser.save()
 									.then(user => {
-										Locations
-											.find({})
-											.populate({
-												path: "saves",
-												select: "fcm_token"
-											})
-											.select({ __v: 0 })
-											.then(locations => {
-												var location = null;
-												for (var i in locations) {
-													if (utilities.getDistance(locations[i].latitude, locations[i].longitude, latitude, longitude) <= 50) {
-														location = locations[i];
+										Locations.aggregate(
+											[
+												{
+													$geoNear: {
+														near: point,
+														spherical: true,
+														distanceField: 'distance',
+														maxDistance: 50
 													}
+												},
+												{
+													$lookup:
+														{
+															from: "users",
+															localField: "saves",
+															foreignField: "_id",
+															as: "saves"
+														}
 												}
-												if (location) {
+											],
+											function (err, locations) {
+												// do what you want with the results here
+												if (err) {
+													return res.json(response.failure(405, error.message))
+												}
+												if (locations[0]) {
+													var location = locations[0]
 													var payload = {
 														data: {
 															title: "Có vị trí kẹt xe mới",
@@ -182,8 +198,7 @@ router.post('/', (req, res) => {
 															}
 															let newLocation = new Locations({
 																title: title,
-																latitude: latitude,
-																longitude: longitude,
+																location:point,
 																total_news: 1,
 																total_level: 0,
 																stop_count: 0,
@@ -226,30 +241,39 @@ router.post('/', (req, res) => {
 															sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =)")
 														});
 												}
-											})
-									})
-									.catch(error => {
-										console.log(error)
-										sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =)")
+											}
+										)
 									})
 							});
 						}
 						else {
-							Locations
-								.find({})
-								.populate({
-									path: "saves",
-									select: "fcm_token"
-								})
-								.select({ __v: 0 })
-								.then(locations => {
-									var location = null;
-									for (var i in locations) {
-										if (utilities.getDistance(locations[i].latitude, locations[i].longitude, latitude, longitude) <= 50) {
-											location = locations[i];
+							Locations.aggregate(
+								[
+									{
+										$geoNear: {
+											near: point,
+											spherical: true,
+											distanceField: 'distance',
+											maxDistance: 50
 										}
+									},
+									{
+										$lookup:
+											{
+												from: "users",
+												localField: "saves",
+												foreignField: "_id",
+												as: "saves"
+											}
 									}
-									if (location) {
+								],
+								function (err, locations) {
+									// do what you want with the results here
+									if (err) {
+										return res.json(response.failure(405, error.message))
+									}
+									if (locations[0]) {
+										var location = locations[0]
 										var payload = {
 											data: {
 												title: "Có vị trí kẹt xe mới",
@@ -264,6 +288,7 @@ router.post('/', (req, res) => {
 												tokens.push(location.saves[i].fcm_token)
 											}
 										}
+
 										// console.log(tokens)
 										Locations
 											.findOneAndUpdate({ _id: location._id }, {
@@ -334,8 +359,7 @@ router.post('/', (req, res) => {
 												}
 												let newLocation = new Locations({
 													title: title,
-													latitude: latitude,
-													longitude: longitude,
+													location:point,
 													total_news: 1,
 													total_level: 0,
 													stop_count: 0,
@@ -371,7 +395,6 @@ router.post('/', (req, res) => {
 															})
 													})
 													.catch(error => {
-														return res.json(response.failure(405, error.message))
 														sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =)")
 													})
 											}).catch(error => {
@@ -379,7 +402,8 @@ router.post('/', (req, res) => {
 												sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =)")
 											});
 									}
-								})
+								}
+							)
 						}
 					})
 					.catch(error => {
