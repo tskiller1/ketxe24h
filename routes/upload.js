@@ -4,10 +4,14 @@ const Multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 var jwt = require("jsonwebtoken");
+const request = require('request')
 
 var utilities = require('../util/utilities')
 var response = require('../util/response')
 var config = require("../config");
+var Locations = require('../models/Locations')
+var News = require('../models/News')
+var User = require('../models/User')
 
 const multer = Multer({
     storage: Multer.memoryStorage(),
@@ -69,17 +73,107 @@ router.post("/image", (req, res) => {
     })
 })
 
+router.post("/uploadForNews", (req, res) => {
+    console.log("a")
+    if (!req.query.token) {
+        // req.flash('info', "You do not have permission")
+        return res.redirect(`/upload?token=${req.query.token}`)
+    }
+    jwt.verify(req.query.token, config.app_secret, (err, decode) => {
+        if (err) {
+            return res.json(response.failure(405, "You do not have permission"))
+        }
+        console.log(decode)
+        var user_id = decode._id;
+        var upload = Multer({
+            storage: storage
+        }).single("file");
+        upload(req, res, err => {
+            if (err) {
+                return res.json(response.failure(405, err.message))
+            }
+            try {
+                var bitmap = fs
+                    .readFileSync(__dirname + "/../public/images/" + req.file.filename)
+                    .toString("hex", 0, 4);
+                if (!utilities.checkMagicNumbers(bitmap)) { //Kiểm tra xem file vừa lưu có phải là hình ảnh 
+                    //nếu không thì xóa
+                    try {
+                        fs.unlinkSync(__dirname + "/../public/images/" + req.file.filename);
+                        return res.redirect(`/upload?token=${req.query.token}`)
+                    } catch (err) {
+                        return res.redirect(`/upload?token=${req.query.token}`)
+                    }
+                }
+                User
+                    .findOne({ user_id: decode.user_id })
+                    .then(user => {
+                        if (!user) {
+                            sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+                            return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
+                        }
+                        News
+                            .findOneAndUpdate({ user_id: user._id, url_image: "" }, { url_image: attachments.payload.url }, { news: true })
+                            .sort('-_id')
+                            .then(news => {
+                                if (!news) {
+                                    sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+                                    return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
+                                }
+                                Locations
+                                    .findOneAndUpdate({ _id: news.location_id }, { lastest_image: attachments.payload.url }, { new: true })
+                                    .then(location => {
+                                        sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+                                        return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
+                                    })
+                                    .catch(error => {
+                                        console.log(error)
+                                        sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+                                        return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
+                                    })
+                            })
+                            .catch(error => {
+                                console.log(error)
+                                sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+                            })
+                    })
+                    .catch(error => {
+                        console.log(error)
+                        sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+                    })
+            } catch (err) {
+                return res.json(response.failure(405, err.message))
+            }
+        })
+    })
+})
+
 router.get("/", (req, res) => {
     if (!req.query.token) {
         return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
     }
-    jwt.verify(req.params.token, config.app_secret, (err, decode) => {
-        if (err) {
-            // console.log(err)
-            return res.json(response.failure(405, "You do not have permission"))
-        }
-        return res.render('upload', decode)
-    })
+    var obj = { token: req.query.token }
+    return res.render('upload', obj)
 })
+
+function sendTextMessage(sender, text) {
+    let messageData = { text: text }
+    request({
+        url: 'https://graph.facebook.com/v2.6/me/messages',
+        qs: { access_token: config.chatbot_token },
+        method: 'POST',
+        json: {
+            recipient: { id: sender },
+            message: messageData
+        }
+    }, function (error, response, body) {
+        if (error) {
+            console.log('Error sending messages: ', error)
+        } else if (response.body.error) {
+            console.log('Error: ', response.body.error)
+        }
+        // console.log(response)
+    })
+}
 
 module.exports = router;
