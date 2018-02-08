@@ -89,7 +89,7 @@ router.post("/uploadForNews", (req, res) => {
         upload(req, res, err => {
             if (err) {
                 console.log(err)
-                return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
+                // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
             }
             try {
                 var bitmap = fs
@@ -99,11 +99,11 @@ router.post("/uploadForNews", (req, res) => {
                     //nếu không thì xóa
                     try {
                         fs.unlinkSync(__dirname + "/../public/images/" + req.file.filename);
-                        return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
+                        // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                     } catch (err) {
                         console.log(err)
                         // sendTextMessage(decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
-                        return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
+                        // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                     }
                 }
                 else {
@@ -122,17 +122,17 @@ router.post("/uploadForNews", (req, res) => {
                                 })
                                 .catch(error => {
                                     console.log(error)
-                                    return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
+                                    // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                                 })
                         })
                         .catch(error => {
                             console.log(error)
-                            return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
+                            // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                         })
                 }
             } catch (err) {
                 console.log(err)
-                return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
+                // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
             }
         })
     })
