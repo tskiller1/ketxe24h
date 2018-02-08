@@ -27,10 +27,6 @@ var storage = Multer.diskStorage({
     }
 });
 
-router.get("/", (req, res) => {
-    return res.json(response.failure(404, "Not Found"))
-})
-
 router.post("/image", (req, res) => {
     if (!req.query.token) {
         return res.json(response.failure(405, "You do not have permission"))
@@ -70,6 +66,19 @@ router.post("/image", (req, res) => {
                 return res.json(response.failure(405, err.message))
             }
         })
+    })
+})
+
+router.get("/", (req, res) => {
+    if (!req.query.token) {
+        return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
+    }
+    jwt.verify(req.params.token, config.app_secret, (err, decode) => {
+        if (err) {
+            // console.log(err)
+            return res.json(response.failure(405, "You do not have permission"))
+        }
+        return res.render('upload', decode)
     })
 })
 

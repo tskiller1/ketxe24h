@@ -1,7 +1,8 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
 const request = require('request')
-var NodeGeocoder = require("node-geocoder");
+const NodeGeocoder = require("node-geocoder");
+const jwt = require("jsonwebtoken");
 
 var response = require('../util/response')
 var utilities = require('../util/utilities')
@@ -198,7 +199,7 @@ router.post('/', (req, res) => {
 															}
 															let newLocation = new Locations({
 																title: title,
-																location:point,
+																location: point,
 																total_news: 1,
 																total_level: 0,
 																stop_count: 0,
@@ -359,7 +360,7 @@ router.post('/', (req, res) => {
 												}
 												let newLocation = new Locations({
 													title: title,
-													location:point,
+													location: point,
 													total_news: 1,
 													total_level: 0,
 													stop_count: 0,
@@ -496,7 +497,15 @@ router.post('/', (req, res) => {
 					if (payload.type === 2) {
 						if (data.type_reply === 1) {
 							//Có hình ảnh
-							sendTextMessage(sender, "Bạn hãy tải hình hoặc video lên cho chúng tôi nhé")
+							sendTextMessage(sender, "Bạn hãy tải hình hoặc video lên đường dẫn sau cho chúng tôi nhé !!!")
+							let token = jwt.sign(
+								{
+									user_id: sender,
+									news_id: data.news_id
+								},
+								config.app_secret
+							);
+							sendTextMessage(sender, `https://api.ketxe24h.info/upload?token=${token}`)
 						} else
 							//Không gửi hình ảnh
 							sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
@@ -584,7 +593,7 @@ function sendImageMessage(sender, news_id) {
 					"buttons": [{
 						"type": "postback",
 						"title": "Có chứ",
-						"payload": setPayload(2, { type_reply: 1 })
+						"payload": setPayload(2, { type_reply: 1, news_id: news_id })
 					},
 					{
 						"type": "postback",
