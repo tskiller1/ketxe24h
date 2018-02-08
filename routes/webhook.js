@@ -270,7 +270,7 @@ router.post('/', (req, res) => {
 								function (err, locations) {
 									// do what you want with the results here
 									if (err) {
-										return res.json(response.failure(405, error.message))
+										return res.json(response.failure(405, err.message))
 									}
 									if (locations[0]) {
 										var location = locations[0]
