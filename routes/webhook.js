@@ -52,6 +52,7 @@ router.post('/', (req, res) => {
 			console.log(attachments)
 			if (attachments.type === "location") {
 				//Gửi vị trí thành công
+				const notification = req.admin.messaging()
 				var payload = attachments.payload;
 				var latitude = payload.coordinates.lat;
 				var longitude = payload.coordinates.long;
