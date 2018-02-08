@@ -98,37 +98,26 @@ router.post("/uploadForNews", (req, res) => {
                     //nếu không thì xóa
                     try {
                         fs.unlinkSync(__dirname + "/../public/images/" + req.file.filename);
+                        return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                     } catch (err) {
                         console.log(err)
-                        sendTextMessage(decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
-                        return res.redirect(`/upload?token=${req.query.token}`)
+                        // sendTextMessage(decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+                        return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                     }
                 }
                 else {
-                    User
-                        .findOne({ user_id: decode.user_id })
-                        .then(user => {
-                            console.log(user)
-                            if (!user) {
-                                return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
+                    News
+                        .findOneAndUpdate({ _id: decode.news_id }, { url_image: "/images/" + req.file.filename }, { news: true })
+                        .then(news => {
+                            console.log(news)
+                            if (!news) {
+                                // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                             }
-                            News
-                                .findOneAndUpdate({ _id: decode.news_id }, { url_image: "/images/" + req.file.filename }, { news: true })
-                                .then(news => {
-                                    console.log(news)
-                                    if (!news) {
-                                        // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
-                                    }
-                                    Locations
-                                        .findOneAndUpdate({ _id: news.location_id }, { lastest_image: news.url_image }, { new: true })
-                                        .then(location => {
-                                            sendTextMessage(decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
-                                            return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
-                                        })
-                                        .catch(error => {
-                                            console.log(error)
-                                            return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
-                                        })
+                            Locations
+                                .findOneAndUpdate({ _id: news.location_id }, { lastest_image: news.url_image }, { new: true })
+                                .then(location => {
+                                    return sendTextMessage(decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+                                    // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                                 })
                                 .catch(error => {
                                     console.log(error)
@@ -141,7 +130,8 @@ router.post("/uploadForNews", (req, res) => {
                         })
                 }
             } catch (err) {
-                return res.json(response.failure(405, err.message))
+                console.log(err)
+                return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
             }
         })
     })
