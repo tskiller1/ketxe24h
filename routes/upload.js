@@ -75,12 +75,11 @@ router.post("/image", (req, res) => {
 
 router.post("/uploadForNews", (req, res) => {
     if (!req.query.token) {
-        // req.flash('info', "You do not have permission")
-        return res.redirect(`/upload?token=${req.query.token}`)
+        return req.json(response.failure(403, "You do not have permission"))
     }
     jwt.verify(req.query.token, config.app_secret, (err, decode) => {
         if (err) {
-            sendTextMessage(res, decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+            return req.json(response.failure(403, "You do not have permission"))
         }
         console.log(decode)
         var upload = Multer({
@@ -89,7 +88,7 @@ router.post("/uploadForNews", (req, res) => {
         upload(req, res, err => {
             if (err) {
                 console.log(err)
-                sendTextMessage(res, decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+                return req.json(response.failure(403, err.message))
             }
             try {
                 var bitmap = fs
@@ -99,10 +98,10 @@ router.post("/uploadForNews", (req, res) => {
                     //nếu không thì xóa
                     try {
                         fs.unlinkSync(__dirname + "/../public/images/" + req.file.filename);
-                        sendTextMessage(res, decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+                        return req.json(response.failure(403, "Không phải kiểu định dạng hình ảnh hoặc video"))
                     } catch (err) {
                         console.log(err)
-                        sendTextMessage(res, decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+                        return req.json(response.failure(403, err.message))
                         // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                     }
                 }
@@ -112,7 +111,7 @@ router.post("/uploadForNews", (req, res) => {
                         .then(news => {
                             console.log(news)
                             if (!news) {
-                                // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
+                                return req.json(response.failure(403, "Can not find this location"))
                             }
                             Locations
                                 .findOneAndUpdate({ _id: news.location_id }, { lastest_image: "/images/" + req.file.filename }, { new: true })
@@ -123,12 +122,12 @@ router.post("/uploadForNews", (req, res) => {
                                 })
                                 .catch(error => {
                                     console.log(error)
-                                    sendTextMessage(res, decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+                                    return req.json(response.failure(403, error.message))
                                 })
                         })
                         .catch(error => {
                             console.log(error)
-                            sendTextMessage(res, decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+                            return req.json(response.failure(403, error.message))
                         })
                 }
             } catch (err) {
@@ -164,7 +163,7 @@ function sendTextMessage(res, sender, text) {
             console.log('Error: ', response.body.error)
         }
         console.log(body)
-        return res.render('thank')
+        return req.json(response.failure(403, "You do not have permission"))
         // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
     })
 }
