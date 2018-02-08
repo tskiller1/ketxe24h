@@ -8,7 +8,6 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose')
 var socketIO = require('socket.io')();
 var ejs = require('ejs')
-var session = require('express-session')
 
 var serviceAccount = require("./serviceAccountKey.json");
 
@@ -51,13 +50,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-// app.use(session({
-//   secret: config.app_secret,
-//   resave: false,
-//   saveUninitialized: true,
-//   cookie: { secure: true }
-// }));
-// app.use(require('flash')());
 
 app.use('/', index);
 app.use('/webhook', webhook)
