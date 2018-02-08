@@ -77,16 +77,12 @@ router.get("/loadByDistance", (req, res) => {
     Locations.aggregate(
         [
             {
-                $match: {
-                    status: true
-                }
-            },
-            {
                 $geoNear: {
                     near: point,
                     spherical: true,
                     distanceField: "distance",
-                    maxDistance: distance
+                    maxDistance: distance,
+                    query: { status: true }
                 }
             },
             {
