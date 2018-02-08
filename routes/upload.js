@@ -80,7 +80,7 @@ router.post("/uploadForNews", (req, res) => {
     }
     jwt.verify(req.query.token, config.app_secret, (err, decode) => {
         if (err) {
-            sendTextMessage(res,decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+            sendTextMessage(res, decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
         }
         console.log(decode)
         var upload = Multer({
@@ -163,8 +163,9 @@ function sendTextMessage(res, sender, text) {
         } else if (response.body.error) {
             console.log('Error: ', response.body.error)
         }
-        return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
-        // console.log(response)
+        console.log(body)
+        return res.render('thank')
+        // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
     })
 }
 
