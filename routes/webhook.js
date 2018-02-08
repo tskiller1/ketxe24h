@@ -417,38 +417,38 @@ router.post('/', (req, res) => {
 				// { type: 'image',
 				// payload:{ url: 'https://scontent-iad3-1.xx.fbcdn.net/v/t35.0-12/25855836_1975729492676578_1643219367_o.png?_nc_ad=z-m&_nc_cid=0&oh=9bf4baa36eccfcd3b6eef2d12b0e6219&oe=5A408198' } 
 				// }
-				User
-					.findOne({ user_id: sender })
-					.then(user => {
-						if (!user) {
-							sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
-						}
-						News
-							.findOneAndUpdate({ user_id: user._id, url_image: "" }, { url_image: attachments.payload.url }, { news: true })
-							.sort('-_id')
-							.then(news => {
-								if (!news) {
-									return sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
-								}
-								Locations
-									.findOneAndUpdate({ _id: news.location_id }, { lastest_image: attachments.payload.url }, { new: true })
-									.then(location => {
-										sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
-									})
-									.catch(error => {
-										console.log(error)
-										sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
-									})
-							})
-							.catch(error => {
-								console.log(error)
-								sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
-							})
-					})
-					.catch(error => {
-						console.log(error)
-						sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
-					})
+				// User
+				// 	.findOne({ user_id: sender })
+				// 	.then(user => {
+				// 		if (!user) {
+				// 			sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+				// 		}
+				// 		News
+				// 			.findOneAndUpdate({ user_id: user._id, url_image: "" }, { url_image: attachments.payload.url }, { news: true })
+				// 			.sort('-_id')
+				// 			.then(news => {
+				// 				if (!news) {
+				// 					return sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+				// 				}
+				// 				Locations
+				// 					.findOneAndUpdate({ _id: news.location_id }, { lastest_image: attachments.payload.url }, { new: true })
+				// 					.then(location => {
+				// 						sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+				// 					})
+				// 					.catch(error => {
+				// 						console.log(error)
+				// 						sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+				// 					})
+				// 			})
+				// 			.catch(error => {
+				// 				console.log(error)
+				// 				sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+				// 			})
+				// 	})
+				// 	.catch(error => {
+				// 		console.log(error)
+				// 		sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
+				// 	})
 			}
 		}
 		if (event.message && event.message.text) {
