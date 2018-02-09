@@ -13,40 +13,40 @@ var router = express.Router();
 
 router.post("/like", (req, res) => {
     if (!req.query.token) {
-        return res.json(response.failure(405, "You do not have permission"))
+        return res.json(response.failure(403, "You do not have permission"))
     }
     if (!req.body.news_id) {
-        return res.json(response.failure(405, "Missing parameters"));
+        return res.json(response.failure(404035, "Missing parameters"));
     }
     var news_id = req.body.news_id;
     jwt.verify(req.query.token, config.app_secret, (err, decode) => {
         if (err) {
-            return res.json(response.failure(405, "You do not have permission"));
+            return res.json(response.failure(403, "You do not have permission"));
         }
         var user_id = decode._id;
         User
             .findOne({ _id: user_id })
             .then(user => {
                 if (!user) {
-                    return res.json(response.failure(405, "You do not have permission"));
+                    return res.json(response.failure(403, "You do not have permission"));
                 }
                 News
                     .findOne({ _id: news_id })
                     .then(news => {
                         if (!news) {
-                            return res.json(response.failure(405, "Can not find this location"))
+                            return res.json(response.failure(403, "Can not find this location"))
                         }
                         var likes = news.likes;
                         if (likes.indexOf(user_id) === -1) {
                             News
                                 .findOneAndUpdate({ _id: news_id }, { $push: { likes: user_id }, count_like: news.count_like + 1 }, { new: true }, (err, doc) => {
                                     if (err) {
-                                        return res.json(response.failure(405, err.message))
+                                        return res.json(response.failure(500, err.message))
                                     }
                                     User
                                         .findOneAndUpdate({ user_id: doc.user_id }, { $inc: { total_likes: 1 } }, { new: true }, (err, doc) => {
                                             if (err) {
-                                                return res.json(response.failure(405, err.message))
+                                                return res.json(response.failure(500, err.message))
                                             }
                                             return res.json(response.success({}))
                                         })
@@ -56,12 +56,12 @@ router.post("/like", (req, res) => {
                             News
                                 .findOneAndUpdate({ _id: news_id }, { $pull: { likes: user_id }, count_like: news.count_like - 1 }, { new: true }, (err, doc) => {
                                     if (err) {
-                                        return res.json(response.failure(405, err.message))
+                                        return res.json(response.failure(500, err.message))
                                     }
                                     User
                                         .findOneAndUpdate({ user_id: doc.user_id }, { $inc: { total_likes: -1 } }, { new: true }, (err, doc) => {
                                             if (err) {
-                                                return res.json(response.failure(405, err.message))
+                                                return res.json(response.failure(500, err.message))
                                             }
                                             return res.json(response.success({}))
                                         })
@@ -69,7 +69,7 @@ router.post("/like", (req, res) => {
                         }
                     })
                     .catch(error => {
-                        return res.json(response.failure(405, error.message))
+                        return res.json(response.failure(500, error.message))
                     })
             })
     })
@@ -77,40 +77,40 @@ router.post("/like", (req, res) => {
 
 router.post("/dislike", (req, res) => {
     if (!req.query.token) {
-        return res.json(response.failure(405, "You do not have permission"))
+        return res.json(response.failure(403, "You do not have permission"))
     }
     if (!req.body.news_id) {
-        return res.json(response.failure(405, "Missing parameters"));
+        return res.json(response.failure(403, "Missing parameters"));
     }
     var news_id = req.body.news_id;
     jwt.verify(req.query.token, config.app_secret, (err, decode) => {
         if (err) {
-            return res.json(response.failure(405, "You do not have permission"));
+            return res.json(response.failure(403, "You do not have permission"));
         }
         var user_id = decode._id;
         User
             .findOne({ _id: user_id })
             .then(user => {
                 if (!user) {
-                    return res.json(response.failure(405, "You do not have permission"));
+                    return res.json(response.failure(403, "You do not have permission"));
                 }
                 News
                     .findOne({ _id: news_id })
                     .then(news => {
                         if (!news) {
-                            return res.json(response.failure(405, "Can not find this location"))
+                            return res.json(response.failure(403, "Can not find this location"))
                         }
                         var dislike = news.dislikes;
                         if (dislike.indexOf(user_id) === -1) {
                             News
                                 .findOneAndUpdate({ _id: news_id }, { $push: { dislikes: user_id }, count_dislike: news.count_dislike + 1 }, { new: true }, (err, doc) => {
                                     if (err) {
-                                        return res.json(response.failure(405, err.message))
+                                        return res.json(response.failure(500, err.message))
                                     }
                                     User
                                         .findOneAndUpdate({ user_id: doc.user_id }, { $inc: { total_dislikes: 1 } }, { new: true }, (err, doc) => {
                                             if (err) {
-                                                return res.json(response.failure(405, err.message))
+                                                return res.json(response.failure(500, err.message))
                                             }
                                             return res.json(response.success({}))
                                         })
@@ -120,12 +120,12 @@ router.post("/dislike", (req, res) => {
                             News
                                 .findOneAndUpdate({ _id: news_id }, { $pull: { dislikes: user_id }, count_dislike: news.count_dislike - 1 }, { new: true }, (err, doc) => {
                                     if (err) {
-                                        return res.json(response.failure(405, err.message))
+                                        return res.json(response.failure(500, err.message))
                                     }
                                     User
                                         .findOneAndUpdate({ user_id: doc.user_id }, { $inc: { total_dislikes: -1 } }, { new: true }, (err, doc) => {
                                             if (err) {
-                                                return res.json(response.failure(405, err.message))
+                                                return res.json(response.failure(500, err.message))
                                             }
                                             return res.json(response.success({}))
                                         })
@@ -133,7 +133,7 @@ router.post("/dislike", (req, res) => {
                         }
                     })
                     .catch(error => {
-                        return res.json(response.failure(405, error.message))
+                        return res.json(response.failure(500, error.message))
                     })
             })
     })
@@ -179,7 +179,7 @@ router.get("/", (req, res) => {
                 News
                     .count({ location_id: location_id }, (err, count) => {
                         if (err) {
-                            return res.json(response.failure(405, err.message))
+                            return res.json(response.failure(500, err.message))
                         }
                         var has_more_page = false;
                         if (skip + newsList.length != count) {
@@ -189,12 +189,12 @@ router.get("/", (req, res) => {
                     })
             })
             .catch(error => {
-                return res.json(response.failure(405, error.message))
+                return res.json(response.failure(500, error.message))
             })
     } else {
         jwt.verify(req.query.token, config.app_secret, (err, decode) => {
             if (err) {
-                return res.json(response.failure(405, "You do not have permission"))
+                return res.json(response.failure(403, "You do not have permission"))
             }
             News
                 .find({ location_id: location_id })
@@ -227,7 +227,7 @@ router.get("/", (req, res) => {
                     News
                         .count({ location_id: location_id }, (err, count) => {
                             if (err) {
-                                return res.json(response.failure(405, err.message))
+                                return res.json(response.failure(500, err.message))
                             }
                             var has_more_page = false;
                             if (skip + newsList.length != count) {
@@ -237,7 +237,7 @@ router.get("/", (req, res) => {
                         })
                 })
                 .catch(error => {
-                    return res.json(response.failure(405, error.message))
+                    return res.json(response.failure(500, error.message))
                 })
         })
     }
@@ -259,7 +259,7 @@ router.get("/:id", (req, res) => {
             return res.json(response.success(newsList))
         })
         .catch(error => {
-            return res.json(response.failure(405, error.message))
+            return res.json(response.failure(500, error.message))
         })
 })
 

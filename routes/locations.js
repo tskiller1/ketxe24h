@@ -49,7 +49,7 @@ router.get("/", function (req, res) {
             Locations
                 .count({}, (err, count) => {
                     if (err) {
-                        return res.json(response.failure(405, err.message))
+                        return res.json(response.failure(500, err.message))
                     }
                     var has_more_page = false;
                     if (skip + locations.length != count) {
@@ -59,7 +59,7 @@ router.get("/", function (req, res) {
                 })
         })
         .catch(error => {
-            return res.json(response.failure(405, error.message))
+            return res.json(response.failure(500, error.message))
         })
 });
 
@@ -95,7 +95,7 @@ router.get("/loadByDistance", (req, res) => {
         function (err, locations) {
             // do what you want with the results here
             if (err) {
-                return res.json(response.failure(405, err.message))
+                return res.json(response.failure(500, err.message))
             }
             return res.json(response.success(locations))
         }
@@ -134,7 +134,7 @@ router.get("/save", (req, res) => {
                 Locations
                     .count({ saves: { $in: [decode._id] } }, (err, count) => {
                         if (err) {
-                            return res.json(response.failure(405, err.message))
+                            return res.json(response.failure(500, err.message))
                         }
                         var has_more_page = false;
                         if (skip + locations.length != count) {
@@ -144,7 +144,7 @@ router.get("/save", (req, res) => {
                     })
             })
             .catch(error => {
-                res.json(response.failure(403, error.message))
+                res.json(response.failure(500, error.message))
             })
     })
 })
@@ -157,7 +157,7 @@ router.get("/:id", (req, res) => {
     if (req.query.token) {
         jwt.verify(token, config.app_secret, (err, decode) => {
             if (err) {
-                return res.json(response.failure(405, "You do not have permission"))
+                return res.json(response.failure(403, "You do not have permission"))
             }
             Locations
                 .findOne({ _id: id })
@@ -173,11 +173,11 @@ router.get("/:id", (req, res) => {
                         console.log(JSON.stringify(newLocation))
                         return res.json(response.success({ location: location }))
                     } else {
-                        return res.json(response.failure(405, "Can not find this location"))
+                        return res.json(response.failure(403, "Can not find this location"))
                     }
                 })
                 .catch(error => {
-                    return res.json(response.failure(405, error.message))
+                    return res.json(response.failure(500, error.message))
                 })
         })
     } else {
@@ -191,11 +191,11 @@ router.get("/:id", (req, res) => {
                     // console.log(JSON.stringify(newLocation))
                     return res.json(response.success(newLocation))
                 } else {
-                    return res.json(response.failure(405, "Can not find this location"))
+                    return res.json(response.failure(403, "Can not find this location"))
                 }
             })
             .catch(error => {
-                return res.json(response.failure(405, error.message))
+                return res.json(response.failure(500, error.message))
             })
     }
 })
@@ -243,7 +243,7 @@ router.get("/:id/share", (req, res) => {
             });
         })
         .catch(error => {
-            return res.json(response.failure(405, error.message))
+            return res.json(response.failure(500, error.message))
         })
 })
 
@@ -302,7 +302,7 @@ router.post("/contribute", (req, res) => {
                         function (err, locations) {
                             // do what you want with the results here
                             if (err) {
-                                return res.json(response.failure(405, err.message))
+                                return res.json(response.failure(500, err.message))
                             }
                             if (locations[0]) {
                                 var location = locations[0]
@@ -368,7 +368,7 @@ router.post("/contribute", (req, res) => {
                                                 }
                                             })
                                             .catch(error => {
-                                                return res.json(response.failure(405, error.message))
+                                                return res.json(response.failure(500, error.message))
                                             })
                                     })
                             } else {
@@ -431,7 +431,7 @@ router.post("/contribute", (req, res) => {
                                                     })
                                             })
                                             .catch(error => {
-                                                return res.json(response.failure(405, error.message))
+                                                return res.json(response.failure(500, error.message))
                                             })
                                     });
                             }
@@ -444,28 +444,28 @@ router.post("/contribute", (req, res) => {
 
 router.post("/save", (req, res) => {
     if (!req.query.token) {
-        return res.json(response.failure(405, "You do not have permission"))
+        return res.json(response.failure(403, "You do not have permission"))
     }
     if (!req.body.location_id) {
-        return res.json(response.failure(405, "Missing parameters"));
+        return res.json(response.failure(403, "Missing parameters"));
     }
     var location_id = req.body.location_id;
     jwt.verify(req.query.token, config.app_secret, (err, decode) => {
         if (err) {
-            return res.json(response.failure(405, "You do not have permission"));
+            return res.json(response.failure(403, "You do not have permission"));
         }
         var user_id = decode._id;
         User
             .findOne({ _id: user_id })
             .then(user => {
                 if (!user) {
-                    return res.json(response.failure(405, "You do not have permission"));
+                    return res.json(response.failure(403, "You do not have permission"));
                 }
                 Locations
                     .findOne({ _id: location_id })
                     .then(location => {
                         if (!location) {
-                            return res.json(response.failure(405, "Can not find this location"))
+                            return res.json(response.failure(403, "Can not find this location"))
                         }
                         var saves = location.saves;
                         if (saves.indexOf(user_id) === -1) {
@@ -475,7 +475,7 @@ router.post("/save", (req, res) => {
                                     return res.json(response.success({}))
                                 })
                                 .catch(error => {
-                                    return res.json(response.failure(405, error.message))
+                                    return res.json(response.failure(500, error.message))
                                 })
                         }
                         else {
@@ -485,12 +485,12 @@ router.post("/save", (req, res) => {
                                     return res.json(response.success({}))
                                 })
                                 .catch(error => {
-                                    return res.json(response.failure(405, error.message))
+                                    return res.json(response.failure(500, error.message))
                                 })
                         }
                     })
                     .catch(error => {
-                        return res.json(response.failure(405, error.message))
+                        return res.json(response.failure(500, error.message))
                     })
             })
 
@@ -502,7 +502,7 @@ router.post("/off", (req, res) => {
         return res.json(response.failure(403, "You do not have permission"));
     }
     if (!req.body.location_id) {
-        return res.json(response.failure(405, "Missing parameters"));
+        return res.json(response.failure(403, "Missing parameters"));
     }
     var id = req.body.location_id;
     var token = req.query.token;
@@ -530,7 +530,7 @@ router.post("/off", (req, res) => {
                                     return res.json(response.success({}))
                                 })
                                 .catch(error => {
-                                    return res.json(response.failure(405, error.message))
+                                    return res.json(response.failure(500, error.message))
                                 })
                         } else {
                             Locations.findOneAndUpdate({ _id: id }, { last_modify: updated_at, $inc: { stop_count: 1 } }, { new: true })
@@ -538,12 +538,12 @@ router.post("/off", (req, res) => {
                                     return res.json(response.success({}))
                                 })
                                 .catch(error => {
-                                    return res.json(response.failure(405, error.message))
+                                    return res.json(response.failure(500, error.message))
                                 })
                         }
                     })
                     .catch(error => {
-                        return res.json(response.failure(405, error.message))
+                        return res.json(response.failure(500, error.message))
                     })
             })
     })
@@ -554,7 +554,7 @@ router.post("/on", (req, res) => {
         return res.json(response.failure(403, "You do not have permission"));
     }
     if (!req.body.location_id) {
-        return res.json(response.failure(405, "Missing parameters"));
+        return res.json(response.failure(403, "Missing parameters"));
     }
     var id = req.body.location_id;
     var token = req.query.token;
@@ -605,7 +605,7 @@ router.post("/on", (req, res) => {
                             })
                     })
                     .catch(error => {
-                        return res.json(response.failure(405, error.message))
+                        return res.json(response.failure(500, error.message))
                     })
             })
     })

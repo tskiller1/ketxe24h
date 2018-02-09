@@ -46,7 +46,7 @@ router.post("/", (req, res) => {
         upload(req, res, err => {
             if (err) {
                 console.log(err)
-                return res.json(response.failure(403, err.message))
+                return res.json(response.failure(500, err.message))
             }
             try {
                 var bitmap = fs
@@ -59,7 +59,7 @@ router.post("/", (req, res) => {
                         return res.json(response.failure(403, "Không phải kiểu định dạng hình ảnh hoặc video"))
                     } catch (err) {
                         console.log(err)
-                        return res.json(response.failure(403, err.message))
+                        return res.json(response.failure(500, err.message))
                     }
                 }
                 else {
@@ -68,7 +68,7 @@ router.post("/", (req, res) => {
                         .then(news => {
                             console.log(news)
                             if (!news) {
-                                return res.json(response.failure(403, "Can not find this location"))
+                                return res.json(response.failure(500, "Can not find this location"))
                             }
                             Locations
                                 .findOneAndUpdate({ _id: news.location_id }, { lastest_image: "/images/" + req.file.filename }, { new: true })
@@ -78,17 +78,17 @@ router.post("/", (req, res) => {
                                 })
                                 .catch(error => {
                                     console.log(error)
-                                    return res.json(response.failure(403, error.message))
+                                    return res.json(response.failure(500, error.message))
                                 })
                         })
                         .catch(error => {
                             console.log(error)
-                            return res.json(response.failure(403, error.message))
+                            return res.json(response.failure(500, error.message))
                         })
                 }
             } catch (err) {
                 console.log(err)
-                return res.json(response.failure(403, error.message))
+                return res.json(response.failure(500, error.message))
             }
         })
     })

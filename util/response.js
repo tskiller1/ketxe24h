@@ -1,6 +1,11 @@
 var utilities = require("./utilities")
 
 function failure(code, message) {
+    //401: exist
+    //402: access denied
+    //403: do not have permission && orther user error
+    //404: not found
+    //500: server error 
     return {
         code: code,
         message: message,

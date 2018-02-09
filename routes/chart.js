@@ -24,7 +24,7 @@ router.get("/:location_id", (req, res) => {
         .select({ __v: 0, saves: 0 })
         .then(location => {
             if (!location) {
-                return res.json(response.failure(405, "Can not find this location"))
+                return res.json(response.failure(403, "Can not find this location"))
             }
             News
                 .find({ location_id: location_id })
