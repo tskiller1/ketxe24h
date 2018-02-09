@@ -18,6 +18,7 @@ var locations = require('./routes/locations');
 var upload = require('./routes/upload');
 var news = require('./routes/news');
 var chart = require('./routes/chart');
+var uploadfornews = require('./routes/uploadfornews');
 
 var config = require('./config')
 var response = require('./util/response')
@@ -52,6 +53,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
+app.use('/upload', uploadfornews)
 app.use('/api/webhook', webhook)
 app.use('/api/user', user)
 app.use('/api/locations', locations)
