@@ -19,21 +19,20 @@
         </div>
         <div class="text-center image">
             <img src="/logo/logo.png" class="img-fluid img-thumbnail" width="200" height="200" />
-            <p id="timer_div" style="margin-top: 30px; font-size:20px">5</p>
+            <p id="timer_div" style="margin-top: 30px; font-size:20px">Chuyển về trang Facebook...</p>
+            <p id="timer_div" style="margin-top: 5px; font-size:20px">5</p>
         </div>
     </div>
 </body>
 <script type="text/JavaScript">
-var seconds_left = 5;
-var interval = setInterval(function() {
-    document.getElementById('timer_div').innerHTML = --seconds_left;
-
-    if (seconds_left <= 0)
-    {
-        document.getElementById('timer_div').innerHTML = 'Chuyển về trang Facebook...';
-        window.location.href = "https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189";
-    }
-}, 1000);
+    var seconds_left = 5;
+    var interval = setInterval(function() {
+        document.getElementById('timer_div').innerHTML = --seconds_left;
+        if (seconds_left <= 0)
+        {
+            window.location.href = "https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189";
+        }
+    }, 1000);
 </script>
 
 </html>
