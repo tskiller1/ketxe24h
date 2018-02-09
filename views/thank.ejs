@@ -14,13 +14,26 @@
 <body>
     <div class="container">
         <div class="row text">
-            <h1 class="text">Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H !!!</h1>
-            <h2 class="text">Đóng góp của bạn sẽ giúp ích cho rất nhiều người khác</h2>
+            <h1 class="text-center">Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H !!!</h1>
+            <h2 class="text-center">Đóng góp của bạn sẽ giúp ích cho rất nhiều người khác</h2>
         </div>
         <div class="text-center image">
             <img src="/logo/logo.png" class="img-fluid img-thumbnail" width="200" height="200" />
+            <p id="timer_div">10</p>
         </div>
     </div>
 </body>
+<script type="text/JavaScript">
+var seconds_left = 10;
+var interval = setInterval(function() {
+    document.getElementById('timer_div').innerHTML = --seconds_left;
+
+    if (seconds_left <= 0)
+    {
+        document.getElementById('timer_div').innerHTML = 'You are ready';
+        window.location.href = "https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189";
+    }
+}, 1000);
+</script>
 
 </html>
