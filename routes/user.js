@@ -12,7 +12,7 @@ router.get("/", function (req, res) {
 
 router.post("/login", (req, res) => {
     if (!req.body.user_id || !req.body.token || !req.body.device_id) {
-        return res.json(response.failure(405, "Missing parameters"));
+        return res.json(response.failure(403, "Missing parameters"));
     }
     var userID = req.body.user_id;
     var fcm_token = req.body.token;
@@ -54,11 +54,11 @@ router.post("/login", (req, res) => {
                                         return res.json(response.success(user))
                                     })
                                     .catch(error => {
-                                        return res.json(response.failure(405, error.message))
+                                        return res.json(response.failure(500, error.message))
                                     })
                             })
                             .catch(error => {
-                                return res.json(response.failure(405, error.message))
+                                return res.json(response.failure(500, error.message))
                             })
                     } else {
                         user = user.toObject();
@@ -68,7 +68,7 @@ router.post("/login", (req, res) => {
                 })
         })
         .catch(function (error) {
-            return res.json(response.failure(405, error.message))
+            return res.json(response.failure(500, error.message))
         });
 })
 
@@ -92,13 +92,13 @@ router.post("/logout", (req, res) => {
                             return res.json(response.success({}))
                         })
                         .catch(function (error) {
-                            return res.json(response.failure(405, error.message))
+                            return res.json(response.failure(500, error.message))
                         });
                 } else {
-                    return res.json(response.failure(405, "Can not find this user"))
+                    return res.json(response.failure(403, "Can not find this user"))
                 }
             }).catch(error => {
-                return res.json(response.failure(405, error.message))
+                return res.json(response.failure(500, error.message))
             })
 
     })
@@ -121,14 +121,14 @@ router.get("/:id", (req, res) => {
                         return res.json(response.success(user))
                     })
                     .catch(error => {
-                        return res.json(response.failure(405, error.message))
+                        return res.json(response.failure(500, error.message))
                     })
             } else {
-                return res.json(response.failure(405, "Can not find this user"))
+                return res.json(response.failure(403, "Can not find this user"))
             }
         })
         .catch(function (error) {
-            return res.json(response.failure(405, error.message))
+            return res.json(response.failure(500, error.message))
         });
 })
 

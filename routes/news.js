@@ -169,6 +169,7 @@ router.get("/", (req, res) => {
             })
             .limit(limit)
             .skip(skip)
+            .sort({ create_at: -1 })
             .then(newsList => {
                 // for (var i = 0; i < newsList.length; i++) {
                 //     newsList[i] = newsList[i].toObject()
@@ -205,6 +206,7 @@ router.get("/", (req, res) => {
                 .limit(limit)
                 .skip(skip)
                 .select({ __v: 0 })
+                .sort({ create_at: -1 })
                 .then(newsList => {
                     for (var i = 0; i < newsList.length; i++) {
                         newsList[i] = newsList[i].toObject()
@@ -233,7 +235,7 @@ router.get("/", (req, res) => {
                             if (skip + newsList.length != count) {
                                 has_more_page = true;
                             }
-                            return res.json(response.successList(newsList , count, page, has_more_page))
+                            return res.json(response.successList(newsList, count, page, has_more_page))
                         })
                 })
                 .catch(error => {
