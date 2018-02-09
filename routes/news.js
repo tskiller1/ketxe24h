@@ -257,8 +257,11 @@ router.get("/:id", (req, res) => {
             path: 'user_id',
             select: 'total_news total_likes total_dislikes full_name'
         })
-        .then(newsList => {
-            return res.json(response.success(newsList))
+        .then(news => {
+            if(!news){
+                return res.json(response.failure(403, "Can not find this news"))
+            }
+            return res.json(response.success(news))
         })
         .catch(error => {
             return res.json(response.failure(500, error.message))
