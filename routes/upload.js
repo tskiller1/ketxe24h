@@ -102,7 +102,6 @@ router.post("/uploadForNews", (req, res) => {
                     } catch (err) {
                         console.log(err)
                         return res.json(response.failure(403, err.message))
-                        // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                     }
                 }
                 else {
@@ -118,8 +117,6 @@ router.post("/uploadForNews", (req, res) => {
                                 .then(location => {
                                     console.log(location)
                                     return res.render('thank')
-                                    // sendTextMessage(res, decode.user_id, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
-                                    // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
                                 })
                                 .catch(error => {
                                     console.log(error)
@@ -146,27 +143,5 @@ router.get("/", (req, res) => {
     var obj = { token: req.query.token }
     return res.render('upload', obj)
 })
-
-function sendTextMessage(res, sender, text) {
-    let messageData = { text: text }
-    request({
-        url: 'https://graph.facebook.com/v2.6/me/messages',
-        qs: { access_token: config.chatbot_token },
-        method: 'POST',
-        json: {
-            recipient: { id: sender },
-            message: messageData
-        }
-    }, function (error, response, body) {
-        if (error) {
-            console.log('Error sending messages: ', error)
-        } else if (response.body.error) {
-            console.log('Error: ', response.body.error)
-        }
-        console.log(body)
-        return res.json(response.failure(403, "You do not have permission"))
-        // return res.redirect("https://www.facebook.com/K%E1%BA%B9t-Xe-24H-201405677074189")
-    })
-}
 
 module.exports = router;

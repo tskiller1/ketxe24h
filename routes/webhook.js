@@ -506,7 +506,7 @@ router.post('/', (req, res) => {
 								},
 								config.app_secret
 							);
-							sendTextMessage(sender, `https://api.ketxe24h.info/upload?token=${token}`)
+							sendTextMessage(sender, `${config.api_server_domain}/upload?token=${token}`)
 						} else
 							//Không gửi hình ảnh
 							sendTextMessage(sender, "Cảm ơn bạn đã đóng góp cho Kẹt Xe 24H =) =) =) !!!")
