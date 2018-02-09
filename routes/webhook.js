@@ -555,7 +555,7 @@ function sendGenericMessage(sender) {
 					"image_url": "https://scontent.fsgn5-4.fna.fbcdn.net/v/t31.0-8/26685685_205968066617950_2090294468182715343_o.png?oh=b69d124d1c1cbef1d00a1cf36a249d67&oe=5B151DEC",
 					"buttons": [{
 						"type": "web_url",
-						"url": "https://www.ketxe24h.com",
+						"url": "https://ketxe24h.info",
 						"title": "Về chúng tôi"
 					}, {
 						"type": "postback",

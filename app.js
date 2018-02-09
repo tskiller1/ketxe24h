@@ -52,12 +52,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
-app.use('/webhook', webhook)
-app.use('/user', user)
-app.use('/locations', locations)
-app.use('/upload', upload)
-app.use('/chart', chart)
-app.use('/news', news)
+app.use('/api/webhook', webhook)
+app.use('/api/user', user)
+app.use('/api/locations', locations)
+app.use('/api/upload', upload)
+app.use('/api/chart', chart)
+app.use('/api/news', news)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
