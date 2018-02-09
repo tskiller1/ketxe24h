@@ -213,14 +213,14 @@ router.get("/:id/share", (req, res) => {
             api_info = {
                 dynamicLinkInfo: {
                     dynamicLinkDomain: "n3ga2.app.goo.gl",
-                    link: config.server_domain + "/api/locations/" + location._id,
+                    link: "https://"+config.server_domain + "/api/locations/" + location._id,
                     androidInfo: {
                         androidPackageName: "com.tlcn.mvpapplication"
                     },
                     socialMetaTagInfo: {
                         socialTitle: location.title,
                         socialDescription: location.title,
-                        socialImageLink: config.server_domain + location.lastest_image
+                        socialImageLink: "https://"+config.server_domain + location.lastest_image
                     }
                 },
                 suffix: {
