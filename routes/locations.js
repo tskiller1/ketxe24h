@@ -40,6 +40,7 @@ router.get("/", function (req, res) {
         }
     }
     var skip = limit * (page - 1)
+
     Locations
         .find({ status: true })
         .select({ __v: 0, saves: 0 })
