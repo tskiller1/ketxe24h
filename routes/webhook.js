@@ -463,6 +463,10 @@ router.post('/', (req, res) => {
 			if (event.postback.payload) {
 				// console.log(event.postback.payload)
 				var spayload = event.postback.payload;
+				if (spayload === "start") {
+					sendGenericMessage(sender)
+					return
+				}
 				var payload = JSON.parse(spayload)
 				console.log(payload)
 				if (payload) {
