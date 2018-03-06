@@ -474,7 +474,9 @@ router.post("/save", (req, res) => {
                             Locations
                                 .findOneAndUpdate({ _id: location_id }, { $push: { saves: user_id } }, { new: true })
                                 .then(newLocation => {
-                                    return res.json(response.success({}))
+                                    var location = newLocation.toObject();
+                                    location.isSave = true;
+                                    return res.json(response.success(location))
                                 })
                                 .catch(error => {
                                     return res.json(response.failure(500, error.message))
@@ -484,7 +486,9 @@ router.post("/save", (req, res) => {
                             Locations
                                 .findOneAndUpdate({ _id: location_id }, { $pull: { saves: user_id } }, { new: true })
                                 .then(newLocation => {
-                                    return res.json(response.success({}))
+                                    var location = newLocation.toObject();
+                                    location.isSave = false;
+                                    return res.json(response.success(location))
                                 })
                                 .catch(error => {
                                     return res.json(response.failure(500, error.message))
@@ -499,7 +503,7 @@ router.post("/save", (req, res) => {
     })
 })
 
-router.post("/off", (req, res) => {
+router.put("/off", (req, res) => {
     if (!req.query.token) {
         return res.json(response.failure(403, "You do not have permission"));
     }
@@ -551,7 +555,7 @@ router.post("/off", (req, res) => {
     })
 })
 
-router.post("/on", (req, res) => {
+router.put("/on", (req, res) => {
     if (!req.query.token) {
         return res.json(response.failure(403, "You do not have permission"));
     }
