@@ -169,16 +169,15 @@ router.get("/:id", (req, res) => {
             }
             Locations
                 .findOne({ _id: id })
-                .select({ __v: 0, saves: 0 })
+                .select({ __v: 0 })
                 .then(location => {
                     if (location) {
                         var newLocation = location.toObject();
                         newLocation.is_save = false;
-                        delete newLocation.saves;
                         if (location.saves.indexOf(decode._id) !== -1) {
                             newLocation.isSave = true;
                         }
-                        console.log(JSON.stringify(newLocation))
+                        delete newLocation.saves;
                         return res.json(response.success({ location }))
                     } else {
                         return res.json(response.failure(403, "Can not find this location"))
