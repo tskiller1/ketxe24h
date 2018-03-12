@@ -173,7 +173,7 @@ router.get("/:id", (req, res) => {
                 .then(location => {
                     if (location) {
                         var newLocation = location.toObject();
-                        newLocation.isSave = false;
+                        newLocation.is_save = false;
                         delete newLocation.saves;
                         if (location.saves.indexOf(decode._id) !== -1) {
                             newLocation.isSave = true;
@@ -195,7 +195,7 @@ router.get("/:id", (req, res) => {
             .then(location => {
                 if (location) {
                     var newLocation = location.toObject();
-                    newLocation.isSave = false;
+                    newLocation.is_save = false;
                     // console.log(JSON.stringify(newLocation))
                     return res.json(response.success(newLocation))
                 } else {
