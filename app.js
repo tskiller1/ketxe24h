@@ -74,11 +74,13 @@ app.use(function (err, req, res, next) {
   // res.locals.message = err.message;
   // res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // // render the error page
+  // render the error page
   // res.status(err.status || 500);
   // res.end(err);
-  console.log(err)
-  return res.render('error');
+  // console.log(err)
+  // return res.render('error');
+
+  return res.json(response.failure(404,"Not Found",{}))
 });
 
 module.exports = app;

@@ -167,6 +167,7 @@ router.get("/:id", (req, res) => {
             if (err) {
                 return res.json(response.failure(403, "You do not have permission"))
             }
+            console.log(decode)
             Locations
                 .findOne({ _id: id })
                 .select({ __v: 0 })
@@ -174,7 +175,8 @@ router.get("/:id", (req, res) => {
                     if (location) {
                         var newLocation = location.toObject();
                         newLocation.is_save = false;
-                        if (newLocation.saves.indexOf(decode._id) !== -1) {
+                        if (location.saves.indexOf(decode._id) !== -1) {
+                            console.log("TRUE")
                             newLocation.is_save = true;
                         }
                         delete newLocation.saves;
