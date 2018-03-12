@@ -53,10 +53,17 @@ router.post("/like", (req, res) => {
                                             path: 'user_id',
                                             select: 'total_news total_likes total_dislikes full_name'
                                         })
-                                        .select({ __v: 0, likes: 0, dislikes: 0 })
+                                        .select({ __v: 0 })
                                         .then(newdoc => {
                                             var obj = newdoc.toObject()
                                             obj.is_like = true
+                                            if (newdoc.dislikes.indexOf(user_id) !== -1) {
+                                                obj.is_dislike = true
+                                            } else {
+                                                obj.is_dislike = false
+                                            }
+                                            delete obj.likes;
+                                            delete obj.dislike;
                                             return res.json(response.success(obj))
                                         })
                                         .catch(err => {
@@ -83,6 +90,13 @@ router.post("/like", (req, res) => {
                                         .then(newdoc => {
                                             var obj = newdoc.toObject()
                                             obj.is_like = false
+                                            if (newdoc.dislikes.indexOf(user_id) !== -1) {
+                                                obj.is_dislike = true
+                                            } else {
+                                                obj.is_dislike = false
+                                            }
+                                            delete obj.likes;
+                                            delete obj.dislike;
                                             return res.json(response.success(obj))
                                         })
                                         .catch(err => {
@@ -142,6 +156,13 @@ router.post("/dislike", (req, res) => {
                                         .then(newdoc => {
                                             var obj = newdoc.toObject()
                                             obj.is_dislike = true
+                                            if (newdoc.likes.indexOf(user_id) !== -1) {
+                                                obj.is_like = true
+                                            } else {
+                                                obj.is_like = false
+                                            }
+                                            delete obj.likes;
+                                            delete obj.dislike;
                                             return res.json(response.success(obj))
                                         })
                                         .catch(err => {
@@ -168,6 +189,13 @@ router.post("/dislike", (req, res) => {
                                         .then(newdoc => {
                                             var obj = newdoc.toObject()
                                             obj.is_dislike = false
+                                            if (newdoc.likes.indexOf(user_id) !== -1) {
+                                                obj.is_like = true
+                                            } else {
+                                                obj.is_like = false
+                                            }
+                                            delete obj.likes;
+                                            delete obj.dislike;
                                             return res.json(response.success(obj))
                                         })
                                         .catch(err => {
