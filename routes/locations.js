@@ -31,7 +31,7 @@ router.get("/", function (req, res) {
         if (limit < 0) {
             return res.json(response.failure(403, "Limit must be greater than 0"));
         }
-        if(limit === 0){
+        if (limit === 0) {
             limit = 15;
         }
     }
@@ -41,7 +41,7 @@ router.get("/", function (req, res) {
         if (page < 0) {
             return res.json(response.failure(403, "Page must be greater than 0"));
         }
-        if(page === 0){
+        if (page === 0) {
             page = 1;
         }
     }
@@ -169,7 +169,7 @@ router.get("/:id", (req, res) => {
             }
             Locations
                 .findOne({ _id: id })
-                .select({ __v: 0 })
+                .select({ __v: 0, saves: 0 })
                 .then(location => {
                     if (location) {
                         var newLocation = location.toObject();
@@ -179,7 +179,7 @@ router.get("/:id", (req, res) => {
                             newLocation.isSave = true;
                         }
                         console.log(JSON.stringify(newLocation))
-                        return res.json(response.success({ location: location }))
+                        return res.json(response.success({ location }))
                     } else {
                         return res.json(response.failure(403, "Can not find this location"))
                     }
@@ -484,7 +484,7 @@ router.post("/save", (req, res) => {
                                     loc.is_save = true;
                                     delete loc.__v;
                                     delete loc.saves
-                                    return res.json(response.success({loc}))
+                                    return res.json(response.success({ loc }))
                                 })
                                 .catch(error => {
                                     return res.json(response.failure(500, error.message))
@@ -498,7 +498,7 @@ router.post("/save", (req, res) => {
                                     loc.is_save = false;
                                     delete loc.__v;
                                     delete loc.saves
-                                    return res.json(response.success({loc}))
+                                    return res.json(response.success({ loc }))
                                 })
                                 .catch(error => {
                                     return res.json(response.failure(500, error.message))
