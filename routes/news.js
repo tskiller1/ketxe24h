@@ -24,12 +24,11 @@ router.post("/like", (req, res) => {
         if (err) {
             return res.json(response.failure(403, "You do not have permission"));
         }
-        console.log(decode)
+        // console.log(decode)
         var user_id = decode._id;
         User
             .findOne({ _id: user_id })
             .then(user => {
-                console.log(user)
                 if (!user) {
                     return res.json(response.failure(403, "You do not have permission"));
                 }
@@ -39,42 +38,57 @@ router.post("/like", (req, res) => {
                         if (!news) {
                             return res.json(response.failure(403, "Can not find this location"))
                         }
+                        // console.log(news)
                         var likes = news.likes;
                         if (likes.indexOf(user_id) === -1) {
-                            News
-                                .findOneAndUpdate({ _id: news_id }, { $push: { likes: user_id }, count_like: news.count_like + 1 }, { new: true }, (err, newdoc) => {
+                            User
+                                .findOneAndUpdate({ _id: news.user_id }, { $inc: { total_likes: 1 } }, { new: true }, (err, doc) => {
                                     if (err) {
                                         return res.json(response.failure(500, err.message))
                                     }
-                                    User
-                                        .findOneAndUpdate({ user_id: newdoc.user_id }, { $inc: { total_likes: 1 } }, { new: true }, (err, doc) => {
+                                    console.log(doc)
+                                    News
+                                        .findOneAndUpdate({ _id: news_id }, { $push: { likes: user_id }, count_like: news.count_like + 1 }, { new: true })
+                                        .populate({
+                                            path: 'user_id',
+                                            select: 'total_news total_likes total_dislikes full_name'
+                                        })
+                                        .select({ __v: 0, likes: 0, dislikes: 0 })
+                                        .then(newdoc => {
+                                            var obj = newdoc.toObject()
+                                            obj.is_like = true
+                                            return res.json(response.success(obj))
+                                        })
+                                        .catch(err => {
                                             if (err) {
                                                 return res.json(response.failure(500, err.message))
                                             }
-                                            var obj = newdoc.toObject();
-                                            delete obj.__v;
-                                            delete obj.likes;
-                                            delete obj.dislikes
-                                            return res.json(response.success(obj))
                                         })
                                 })
                         }
                         else {
-                            News
-                                .findOneAndUpdate({ _id: news_id }, { $pull: { likes: user_id }, count_like: news.count_like - 1 }, { new: true }, (err, newdoc) => {
+                            User
+                                .findOneAndUpdate({ _id: news.user_id }, { $inc: { total_likes: -1 } }, { new: true }, (err, doc) => {
+                                    console.log(doc)
                                     if (err) {
                                         return res.json(response.failure(500, err.message))
                                     }
-                                    User
-                                        .findOneAndUpdate({ user_id: newdoc.user_id }, { $inc: { total_likes: -1 } }, { new: true }, (err, doc) => {
+                                    News
+                                        .findOneAndUpdate({ _id: news_id }, { $pull: { likes: user_id }, count_like: news.count_like - 1 }, { new: true })
+                                        .populate({
+                                            path: 'user_id',
+                                            select: 'total_news total_likes total_dislikes full_name'
+                                        })
+                                        .select({ __v: 0, likes: 0, dislikes: 0 })
+                                        .then(newdoc => {
+                                            var obj = newdoc.toObject()
+                                            obj.is_like = false
+                                            return res.json(response.success(obj))
+                                        })
+                                        .catch(err => {
                                             if (err) {
                                                 return res.json(response.failure(500, err.message))
                                             }
-                                            var obj = newdoc.toObject();
-                                            delete obj.__v;
-                                            delete obj.likes;
-                                            delete obj.dislikes
-                                            return res.json(response.success(obj))
                                         })
                                 })
                         }
@@ -113,40 +127,53 @@ router.post("/dislike", (req, res) => {
                         }
                         var dislike = news.dislikes;
                         if (dislike.indexOf(user_id) === -1) {
-                            News
-                                .findOneAndUpdate({ _id: news_id }, { $push: { dislikes: user_id }, count_dislike: news.count_dislike + 1 }, { new: true }, (err, newdoc) => {
+                            User
+                                .findOneAndUpdate({ _id: news.user_id }, { $inc: { total_dislikes: 1 } }, { new: true }, (err, doc) => {
                                     if (err) {
                                         return res.json(response.failure(500, err.message))
                                     }
-                                    User
-                                        .findOneAndUpdate({ user_id: newdoc.user_id }, { $inc: { total_dislikes: 1 } }, { new: true }, (err, doc) => {
+                                    News
+                                        .findOneAndUpdate({ _id: news_id }, { $push: { dislikes: user_id }, count_dislike: news.count_dislike + 1 }, { new: true })
+                                        .populate({
+                                            path: 'user_id',
+                                            select: 'total_news total_likes total_dislikes full_name'
+                                        })
+                                        .select({ __v: 0, likes: 0, dislikes: 0 })
+                                        .then(newdoc => {
+                                            var obj = newdoc.toObject()
+                                            obj.is_dislike = true
+                                            return res.json(response.success(obj))
+                                        })
+                                        .catch(err => {
                                             if (err) {
                                                 return res.json(response.failure(500, err.message))
                                             }
-                                            var obj = newdoc.toObject();
-                                            delete obj.__v;
-                                            delete obj.likes;
-                                            delete obj.dislikes
-                                            return res.json(response.success(obj))
                                         })
                                 })
                         }
                         else {
-                            News
-                                .findOneAndUpdate({ _id: news_id }, { $pull: { dislikes: user_id }, count_dislike: news.count_dislike - 1 }, { new: true }, (err, newdoc) => {
+                            User
+                                .findOneAndUpdate({ _id: news.user_id }, { $inc: { total_dislikes: -1 } }, { new: true }, (err, doc) => {
+                                    console.log(doc)
                                     if (err) {
                                         return res.json(response.failure(500, err.message))
                                     }
-                                    User
-                                        .findOneAndUpdate({ user_id: newdoc.user_id }, { $inc: { total_dislikes: -1 } }, { new: true }, (err, doc) => {
+                                    News
+                                        .findOneAndUpdate({ _id: news_id }, { $pull: { dislikes: user_id }, count_dislike: news.count_dislike - 1 }, { new: true })
+                                        .populate({
+                                            path: 'user_id',
+                                            select: 'total_news total_likes total_dislikes full_name'
+                                        })
+                                        .select({ __v: 0, likes: 0, dislikes: 0 })
+                                        .then(newdoc => {
+                                            var obj = newdoc.toObject()
+                                            obj.is_dislike = false
+                                            return res.json(response.success(obj))
+                                        })
+                                        .catch(err => {
                                             if (err) {
                                                 return res.json(response.failure(500, err.message))
                                             }
-                                            var obj = newdoc.toObject();
-                                            delete obj.__v;
-                                            delete obj.likes;
-                                            delete obj.dislikes
-                                            return res.json(response.success(obj))
                                         })
                                 })
                         }
@@ -239,14 +266,14 @@ router.get("/", (req, res) => {
                         //     newsList[i].url_image = "https://" + req.hostname + newsList[i].url_image
                         // }
                         if (newsList[i].likes.indexOf(decode._id) !== -1) {
-                            newsList[i].isLike = true
+                            newsList[i].is_like = true
                         } else {
-                            newsList[i].isLike = false
+                            newsList[i].is_like = false
                         }
                         if (newsList[i].dislikes.indexOf(decode._id) !== -1) {
-                            newsList[i].isDisike = true
+                            newsList[i].is_dislike = true
                         } else {
-                            newsList[i].isDislike = false
+                            newsList[i].is_dislike = false
                         }
                         delete newsList[i].likes
                         delete newsList[i].dislikes
@@ -275,22 +302,63 @@ router.get("/:id", (req, res) => {
         return res.json(response.failure(404, "Not Found"));
     }
     var id = req.params.id;
-    News
-        .find({ _id: id })
-        .select({ __v: 0, likes: 0, dislikes: 0 })
-        .populate({
-            path: 'user_id',
-            select: 'total_news total_likes total_dislikes full_name'
-        })
-        .then(news => {
-            if (!news) {
-                return res.json(response.failure(403, "Can not find this news"))
+    if (req.query.token) {
+        jwt.verify(req.query.token, config.app_secret, (err, decode) => {
+            if (err) {
+                return res.json(response.failure(403, "You do not have permission"))
             }
-            return res.json(response.success(news))
+            User
+                .findOne({ _id: decode._id })
+                .then(user => {
+                    if (!user) {
+                        return res.json(response.failure(403, "You do not have permission"));
+                    }
+                    News
+                        .find({ _id: id })
+                        .select({ __v: 0 })
+                        .populate({
+                            path: 'user_id',
+                            select: 'total_news total_likes total_dislikes full_name'
+                        })
+                        .then(news => {
+                            if (!news) {
+                                return res.json(response.failure(403, "Can not find this news"))
+                            }
+                            var newobj = news.toObject();
+                            newobj.is_like = false;
+                            newobj.is_dislike = false;
+                            if (news.likes.indexOf(user._id) !== -1) {
+                                newobj.is_like = true;
+                            }
+                            if (news.dislikes.indexOf(user._id) !== -1) {
+                                newobj.is_dislike = true;
+                            }
+                            return res.json(response.success(news))
+                        })
+                        .catch(error => {
+                            return res.json(response.failure(500, error.message))
+                        })
+                })
         })
-        .catch(error => {
-            return res.json(response.failure(500, error.message))
-        })
+    }
+    else {
+        News
+            .find({ _id: id })
+            .select({ __v: 0, likes: 0, dislikes: 0 })
+            .populate({
+                path: 'user_id',
+                select: 'total_news total_likes total_dislikes full_name'
+            })
+            .then(news => {
+                if (!news) {
+                    return res.json(response.failure(403, "Can not find this news"))
+                }
+                return res.json(response.success(news))
+            })
+            .catch(error => {
+                return res.json(response.failure(500, error.message))
+            })
+    }
 })
 
 module.exports = router;
