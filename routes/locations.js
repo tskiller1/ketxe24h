@@ -163,8 +163,7 @@ router.get("/:id", (req, res) => {
     }
     var id = req.params.id;
     if (req.query.token) {
-        console.log("TRUE")
-        jwt.verify(token, config.app_secret, (err, decode) => {
+        jwt.verify(req.query.token, config.app_secret, (err, decode) => {
             if (err) {
                 return res.json(response.failure(403, "You do not have permission"))
             }
