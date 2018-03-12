@@ -167,7 +167,7 @@ router.get("/:id", (req, res) => {
             if (err) {
                 return res.json(response.failure(403, "You do not have permission"))
             }
-            console.log(decode)
+            // console.log(decode)
             Locations
                 .findOne({ _id: id })
                 .select({ __v: 0 })

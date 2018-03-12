@@ -48,7 +48,11 @@ router.post("/like", (req, res) => {
                                             if (err) {
                                                 return res.json(response.failure(500, err.message))
                                             }
-                                            return res.json(response.success({}))
+                                            var obj = doc.toObject();
+                                            delete obj.__v;
+                                            delete obj.likes;
+                                            delete obj.dislikes
+                                            return res.json(response.success(obj))
                                         })
                                 })
                         }
@@ -63,7 +67,11 @@ router.post("/like", (req, res) => {
                                             if (err) {
                                                 return res.json(response.failure(500, err.message))
                                             }
-                                            return res.json(response.success({}))
+                                            var obj = doc.toObject();
+                                            delete obj.__v;
+                                            delete obj.likes;
+                                            delete obj.dislikes
+                                            return res.json(response.success(obj))
                                         })
                                 })
                         }
@@ -112,7 +120,11 @@ router.post("/dislike", (req, res) => {
                                             if (err) {
                                                 return res.json(response.failure(500, err.message))
                                             }
-                                            return res.json(response.success({}))
+                                            var obj = doc.toObject();
+                                            delete obj.__v;
+                                            delete obj.likes;
+                                            delete obj.dislikes
+                                            return res.json(response.success(obj))
                                         })
                                 })
                         }
@@ -127,7 +139,11 @@ router.post("/dislike", (req, res) => {
                                             if (err) {
                                                 return res.json(response.failure(500, err.message))
                                             }
-                                            return res.json(response.success({}))
+                                            var obj = doc.toObject();
+                                            delete obj.__v;
+                                            delete obj.likes;
+                                            delete obj.dislikes
+                                            return res.json(response.success(obj))
                                         })
                                 })
                         }
