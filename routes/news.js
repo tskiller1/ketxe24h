@@ -146,15 +146,21 @@ router.get("/", (req, res) => {
     var limit = 15;
     if (req.query.limit) {
         limit = parseInt(req.query.limit)
-        if (limit <= 0) {
+        if (limit < 0) {
             return res.json(response.failure(403, "Limit must be greater than 0"));
+        }
+        if(limit === 0){
+            limit = 15;
         }
     }
     var page = 1
     if (req.query.page) {
         page = parseInt(req.query.page)
-        if (page <= 0) {
+        if (page < 0) {
             return res.json(response.failure(403, "Page must be greater than 0"));
+        }
+        if(page === 0){
+            page = 1;
         }
     }
     var skip = limit * (page - 1)

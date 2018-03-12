@@ -480,7 +480,11 @@ router.post("/save", (req, res) => {
                             Locations
                                 .findOneAndUpdate({ _id: location_id }, { $push: { saves: user_id } }, { new: true })
                                 .then(newLocation => {
-                                    return res.json(response.success({}))
+                                    var loc = newLocation.toObject();
+                                    loc.is_save = true;
+                                    delete loc.__v;
+                                    delete loc.saves
+                                    return res.json(response.success({loc}))
                                 })
                                 .catch(error => {
                                     return res.json(response.failure(500, error.message))
@@ -490,7 +494,11 @@ router.post("/save", (req, res) => {
                             Locations
                                 .findOneAndUpdate({ _id: location_id }, { $pull: { saves: user_id } }, { new: true })
                                 .then(newLocation => {
-                                    return res.json(response.success({}))
+                                    var loc = newLocation.toObject();
+                                    loc.is_save = false;
+                                    delete loc.__v;
+                                    delete loc.saves
+                                    return res.json(response.success({loc}))
                                 })
                                 .catch(error => {
                                     return res.json(response.failure(500, error.message))
