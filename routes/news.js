@@ -111,7 +111,7 @@ router.post("/dislike", (req, res) => {
                         var dislike = news.dislikes;
                         if (dislike.indexOf(user_id) === -1) {
                             News
-                                .findOneAndUpdate({ _id: news_id }, { $push: { dislikes: user_id }, count_dislike: news.count_dislike + 1 }, { new: true }, (err, doc) => {
+                                .findOneAndUpdate({ _id: news_id }, { $push: { dislikes: user_id }, count_dislike: news.count_dislike + 1 }, { new: true }, (err, newdoc) => {
                                     if (err) {
                                         return res.json(response.failure(500, err.message))
                                     }
@@ -120,7 +120,7 @@ router.post("/dislike", (req, res) => {
                                             if (err) {
                                                 return res.json(response.failure(500, err.message))
                                             }
-                                            var obj = doc.toObject();
+                                            var obj = newdoc.toObject();
                                             delete obj.__v;
                                             delete obj.likes;
                                             delete obj.dislikes
@@ -130,7 +130,7 @@ router.post("/dislike", (req, res) => {
                         }
                         else {
                             News
-                                .findOneAndUpdate({ _id: news_id }, { $pull: { dislikes: user_id }, count_dislike: news.count_dislike - 1 }, { new: true }, (err, doc) => {
+                                .findOneAndUpdate({ _id: news_id }, { $pull: { dislikes: user_id }, count_dislike: news.count_dislike - 1 }, { new: true }, (err, newdoc) => {
                                     if (err) {
                                         return res.json(response.failure(500, err.message))
                                     }
@@ -139,7 +139,7 @@ router.post("/dislike", (req, res) => {
                                             if (err) {
                                                 return res.json(response.failure(500, err.message))
                                             }
-                                            var obj = doc.toObject();
+                                            var obj = newdoc.toObject();
                                             delete obj.__v;
                                             delete obj.likes;
                                             delete obj.dislikes
