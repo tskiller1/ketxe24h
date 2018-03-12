@@ -173,12 +173,12 @@ router.get("/:id", (req, res) => {
                 .then(location => {
                     if (location) {
                         var newLocation = location.toObject();
-                        location.is_save = false;
-                        if (location.saves.indexOf(decode._id) !== -1) {
-                            location.is_save = true;
+                        newLocation.is_save = false;
+                        if (newLocation.saves.indexOf(decode._id) !== -1) {
+                            newLocation.is_save = true;
                         }
-                        delete location.saves;
-                        return res.json(response.success(location))
+                        delete newLocation.saves;
+                        return res.json(response.success(newLocation))
                     } else {
                         return res.json(response.failure(403, "Can not find this location"))
                     }
