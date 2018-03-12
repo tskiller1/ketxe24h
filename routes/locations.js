@@ -483,7 +483,7 @@ router.post("/save", (req, res) => {
                                     loc.is_save = true;
                                     delete loc.__v;
                                     delete loc.saves
-                                    return res.json(response.success({ loc }))
+                                    return res.json(response.success(loc))
                                 })
                                 .catch(error => {
                                     return res.json(response.failure(500, error.message))
@@ -497,7 +497,7 @@ router.post("/save", (req, res) => {
                                     loc.is_save = false;
                                     delete loc.__v;
                                     delete loc.saves
-                                    return res.json(response.success({ loc }))
+                                    return res.json(response.success(loc))
                                 })
                                 .catch(error => {
                                     return res.json(response.failure(500, error.message))
