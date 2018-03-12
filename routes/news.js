@@ -12,6 +12,7 @@ var User = require("../models/User");
 var router = express.Router();
 
 router.post("/like", (req, res) => {
+    console.log(req.query)
     if (!req.query.token) {
         return res.json(response.failure(403, "You do not have permission"))
     }
@@ -23,10 +24,12 @@ router.post("/like", (req, res) => {
         if (err) {
             return res.json(response.failure(403, "You do not have permission"));
         }
+        console.log(decode)
         var user_id = decode._id;
         User
             .findOne({ _id: user_id })
             .then(user => {
+                console.log(user)
                 if (!user) {
                     return res.json(response.failure(403, "You do not have permission"));
                 }
@@ -39,16 +42,16 @@ router.post("/like", (req, res) => {
                         var likes = news.likes;
                         if (likes.indexOf(user_id) === -1) {
                             News
-                                .findOneAndUpdate({ _id: news_id }, { $push: { likes: user_id }, count_like: news.count_like + 1 }, { new: true }, (err, doc) => {
+                                .findOneAndUpdate({ _id: news_id }, { $push: { likes: user_id }, count_like: news.count_like + 1 }, { new: true }, (err, newdoc) => {
                                     if (err) {
                                         return res.json(response.failure(500, err.message))
                                     }
                                     User
-                                        .findOneAndUpdate({ user_id: doc.user_id }, { $inc: { total_likes: 1 } }, { new: true }, (err, doc) => {
+                                        .findOneAndUpdate({ user_id: newdoc.user_id }, { $inc: { total_likes: 1 } }, { new: true }, (err, doc) => {
                                             if (err) {
                                                 return res.json(response.failure(500, err.message))
                                             }
-                                            var obj = doc.toObject();
+                                            var obj = newdoc.toObject();
                                             delete obj.__v;
                                             delete obj.likes;
                                             delete obj.dislikes
@@ -58,16 +61,16 @@ router.post("/like", (req, res) => {
                         }
                         else {
                             News
-                                .findOneAndUpdate({ _id: news_id }, { $pull: { likes: user_id }, count_like: news.count_like - 1 }, { new: true }, (err, doc) => {
+                                .findOneAndUpdate({ _id: news_id }, { $pull: { likes: user_id }, count_like: news.count_like - 1 }, { new: true }, (err, newdoc) => {
                                     if (err) {
                                         return res.json(response.failure(500, err.message))
                                     }
                                     User
-                                        .findOneAndUpdate({ user_id: doc.user_id }, { $inc: { total_likes: -1 } }, { new: true }, (err, doc) => {
+                                        .findOneAndUpdate({ user_id: newdoc.user_id }, { $inc: { total_likes: -1 } }, { new: true }, (err, doc) => {
                                             if (err) {
                                                 return res.json(response.failure(500, err.message))
                                             }
-                                            var obj = doc.toObject();
+                                            var obj = newdoc.toObject();
                                             delete obj.__v;
                                             delete obj.likes;
                                             delete obj.dislikes
@@ -116,7 +119,7 @@ router.post("/dislike", (req, res) => {
                                         return res.json(response.failure(500, err.message))
                                     }
                                     User
-                                        .findOneAndUpdate({ user_id: doc.user_id }, { $inc: { total_dislikes: 1 } }, { new: true }, (err, doc) => {
+                                        .findOneAndUpdate({ user_id: newdoc.user_id }, { $inc: { total_dislikes: 1 } }, { new: true }, (err, doc) => {
                                             if (err) {
                                                 return res.json(response.failure(500, err.message))
                                             }
@@ -135,7 +138,7 @@ router.post("/dislike", (req, res) => {
                                         return res.json(response.failure(500, err.message))
                                     }
                                     User
-                                        .findOneAndUpdate({ user_id: doc.user_id }, { $inc: { total_dislikes: -1 } }, { new: true }, (err, doc) => {
+                                        .findOneAndUpdate({ user_id: newdoc.user_id }, { $inc: { total_dislikes: -1 } }, { new: true }, (err, doc) => {
                                             if (err) {
                                                 return res.json(response.failure(500, err.message))
                                             }
@@ -165,7 +168,7 @@ router.get("/", (req, res) => {
         if (limit < 0) {
             return res.json(response.failure(403, "Limit must be greater than 0"));
         }
-        if(limit === 0){
+        if (limit === 0) {
             limit = 15;
         }
     }
@@ -175,7 +178,7 @@ router.get("/", (req, res) => {
         if (page < 0) {
             return res.json(response.failure(403, "Page must be greater than 0"));
         }
-        if(page === 0){
+        if (page === 0) {
             page = 1;
         }
     }
@@ -280,7 +283,7 @@ router.get("/:id", (req, res) => {
             select: 'total_news total_likes total_dislikes full_name'
         })
         .then(news => {
-            if(!news){
+            if (!news) {
                 return res.json(response.failure(403, "Can not find this news"))
             }
             return res.json(response.success(news))
