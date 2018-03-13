@@ -177,7 +177,10 @@ router.get("/favourite", (req, res) => {
                             return res.json(response.failure(500, err.message))
                         }
                         for (var i in locations2) {
-                            if (locations1.indexOf(locations2[i]) === -1) {
+                            var found = locations1.find(function (element) {
+                                return element._id === locations2[i]._id;
+                            });
+                            if (found) {
                                 locations1.push(locations2[i])
                             }
                         }
@@ -212,7 +215,10 @@ router.get("/favourite", (req, res) => {
                                         return res.json(response.failure(500, err.message))
                                     }
                                     for (var j in locations3) {
-                                        if (locations1.indexOf(locations3[j]) === -1) {
+                                        var found = locations1.find(function (element) {
+                                            return element._id === locations3[j]._id;
+                                        });
+                                        if (found) {
                                             locations1.push(locations3[j])
                                         }
                                     }
