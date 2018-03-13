@@ -249,7 +249,7 @@ router.get("/", (req, res) => {
             })
             .limit(limit)
             .skip(skip)
-            .sort({ create_at: -1 })
+            .sort({ created_at: -1 })
             .then(newsList => {
                 // for (var i = 0; i < newsList.length; i++) {
                 //     newsList[i] = newsList[i].toObject()
@@ -286,7 +286,7 @@ router.get("/", (req, res) => {
                 .limit(limit)
                 .skip(skip)
                 .select({ __v: 0 })
-                .sort({ create_at: -1 })
+                .sort({ created_at: -1 })
                 .then(newsList => {
                     for (var i = 0; i < newsList.length; i++) {
                         newsList[i] = newsList[i].toObject()
