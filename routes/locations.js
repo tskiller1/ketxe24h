@@ -55,7 +55,7 @@ router.get("/", function (req, res) {
         .sort({ last_modify: -1 })
         .then(locations => {
             Locations
-                .count({}, (err, count) => {
+                .count({ status: true }, (err, count) => {
                     if (err) {
                         return res.json(response.failure(500, err.message))
                     }
