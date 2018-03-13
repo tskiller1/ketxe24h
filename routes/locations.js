@@ -288,99 +288,173 @@ router.post("/contribute", (req, res) => {
                     if (!user) {
                         return res.json(response.failure(403, "You do not have permission"));
                     }
-                    Locations.aggregate(
-                        [
-                            {
-                                $geoNear: {
-                                    near: point,
-                                    spherical: true,
-                                    distanceField: 'distance',
-                                    maxDistance: 50
-                                }
-                            },
-                            {
-                                $lookup:
-                                    {
-                                        from: "users",
-                                        localField: "saves",
-                                        foreignField: "_id",
-                                        as: "saves"
-                                    }
-                            }
-                        ],
-                        function (err, locations) {
-                            // do what you want with the results here
+                    Locations
+                        .count({}, (err, count) => {
                             if (err) {
                                 return res.json(response.failure(500, err.message))
                             }
-                            if (locations[0]) {
-                                var location = locations[0]
-                                var payload = {
-                                    data: {
-                                        title: "Có vị trí kẹt xe mới",
-                                        messageBody: location.title,
-                                        location_id: location._id.toString()
-                                    }
-                                };
-                                var tokens = []
-                                for (var i = 0; i < location.saves.length; i++) {
-                                    // console.log(location.saves[i].fcm_token)
-                                    if (location.saves[i].fcm_token) {
-                                        tokens.push(location.saves[i].fcm_token)
-                                    }
-                                }
-                                console.log(location)
-                                var total_news = location.total_news + 1;
-                                var total_level = location.total_level + level;
-                                var average_rate = total_level / total_news;
-                                Locations
-                                    .findOneAndUpdate({ _id: location._id }, {
-                                        total_news: total_news,
-                                        total_level: total_level,
-                                        average_rate: average_rate,
-                                        lastest_image: file,
-                                        status: true,
-                                        current_level: level,
-                                        last_modify: created_at
-                                    }, { new: true })
-                                    .then(location => {
-                                        let newNews = new News({
-                                            user_id: userID,
-                                            created_at: created_at,
-                                            level: level,
-                                            description: description,
-                                            url_image: file,
-                                            count_like: 0,
-                                            count_dislike: 0,
-                                            type: 1,
-                                            location_id: location._id,
-                                            likes: [],
-                                            dislikes: []
-                                        })
-                                        newNews
-                                            .save()
-                                            .then(news => {
-                                                utilities.onLocationChanged(req.socketIO, location)
-                                                if (tokens.length > 0) {
-                                                    notification
-                                                        .sendToDevice(tokens, payload)
-                                                        .then(resp => {
-                                                            console.log(resp)
-                                                            return res.json(response.success({}))
+                            if (count != 0) {
+                                Locations.aggregate(
+                                    [
+                                        {
+                                            $geoNear: {
+                                                near: point,
+                                                spherical: true,
+                                                distanceField: 'distance',
+                                                maxDistance: 50
+                                            }
+                                        },
+                                        {
+                                            $lookup:
+                                                {
+                                                    from: "users",
+                                                    localField: "saves",
+                                                    foreignField: "_id",
+                                                    as: "saves"
+                                                }
+                                        }
+                                    ],
+                                    function (err, locations) {
+                                        // do what you want with the results here
+                                        if (err) {
+                                            console.log(err)
+                                            return res.json(response.failure(500, err.message))
+                                        }
+                                        if (locations[0]) {
+                                            var location = locations[0]
+                                            var payload = {
+                                                data: {
+                                                    title: "Có vị trí kẹt xe mới",
+                                                    messageBody: location.title,
+                                                    location_id: location._id.toString()
+                                                }
+                                            };
+                                            var tokens = []
+                                            for (var i = 0; i < location.saves.length; i++) {
+                                                // console.log(location.saves[i].fcm_token)
+                                                if (location.saves[i].fcm_token) {
+                                                    tokens.push(location.saves[i].fcm_token)
+                                                }
+                                            }
+                                            console.log(location)
+                                            var total_news = location.total_news + 1;
+                                            var total_level = location.total_level + level;
+                                            var average_rate = total_level / total_news;
+                                            Locations
+                                                .findOneAndUpdate({ _id: location._id }, {
+                                                    total_news: total_news,
+                                                    total_level: total_level,
+                                                    average_rate: average_rate,
+                                                    lastest_image: file,
+                                                    status: true,
+                                                    current_level: level,
+                                                    last_modify: created_at
+                                                }, { new: true })
+                                                .then(location => {
+                                                    let newNews = new News({
+                                                        user_id: userID,
+                                                        created_at: created_at,
+                                                        level: level,
+                                                        description: description,
+                                                        url_image: file,
+                                                        count_like: 0,
+                                                        count_dislike: 0,
+                                                        type: 1,
+                                                        location_id: location._id,
+                                                        likes: [],
+                                                        dislikes: []
+                                                    })
+                                                    newNews
+                                                        .save()
+                                                        .then(news => {
+                                                            utilities.onLocationChanged(req.socketIO, location)
+                                                            if (tokens.length > 0) {
+                                                                notification
+                                                                    .sendToDevice(tokens, payload)
+                                                                    .then(resp => {
+                                                                        console.log(resp)
+                                                                        return res.json(response.success({}))
+                                                                    })
+                                                                    .catch(error => {
+                                                                        console.log(error.message)
+                                                                        return res.json(response.success({}))
+                                                                    })
+                                                            } else {
+                                                                return res.json(response.success({}))
+                                                            }
                                                         })
                                                         .catch(error => {
-                                                            console.log(error.message)
-                                                            return res.json(response.success({}))
+                                                            return res.json(response.failure(500, error.message))
                                                         })
-                                                } else {
-                                                    return res.json(response.success({}))
-                                                }
-                                            })
-                                            .catch(error => {
-                                                return res.json(response.failure(500, error.message))
-                                            })
-                                    })
-                            } else {
+                                                })
+                                        } else {
+                                            geocoder
+                                                .reverse({ lat: latitude, lon: longitude })
+                                                .then(function (result) {
+                                                    var title;
+                                                    if (result[0].streetNubmer) {
+                                                        title =
+                                                            "Kẹt xe tại số " +
+                                                            result[0].streetNumber +
+                                                            ", " +
+                                                            result[0].streetName +
+                                                            ", " +
+                                                            result[0].administrativeLevels.level2long;
+                                                    } else {
+                                                        title =
+                                                            "Kẹt xe tại " +
+                                                            result[0].streetName +
+                                                            ", " +
+                                                            result[0].administrativeLevels.level2long;
+                                                    }
+                                                    let newLocation = new Locations({
+                                                        title: title,
+                                                        location: point,
+                                                        total_news: 1,
+                                                        total_level: level,
+                                                        stop_count: 0,
+                                                        average_rate: level,
+                                                        lastest_image: file,
+                                                        status: true,
+                                                        current_level: level,
+                                                        last_modify: created_at,
+                                                        saves: []
+                                                    })
+                                                    newLocation
+                                                        .save()
+                                                        .then(location => {
+                                                            let newNews = new News({
+                                                                user_id: userID,
+                                                                created_at: created_at,
+                                                                level: level,
+                                                                description: description,
+                                                                url_image: file,
+                                                                count_like: 0,
+                                                                count_dislike: 0,
+                                                                location_id: location._id,
+                                                                type: 1,
+                                                                likes: [],
+                                                                dislikes: []
+                                                            })
+                                                            newNews
+                                                                .save()
+                                                                .then(news => {
+                                                                    utilities.onLocationChanged(req.socketIO, location)
+                                                                    return res.json(response.success({}))
+                                                                })
+                                                                .catch(error => {
+                                                                    return res.json(response.success({}))
+                                                                })
+                                                        })
+                                                        .catch(error => {
+                                                            return res.json(response.failure(500, error.message))
+                                                        })
+                                                });
+                                        }
+                                    }
+                                )
+                            }
+                            else {
                                 geocoder
                                     .reverse({ lat: latitude, lon: longitude })
                                     .then(function (result) {
@@ -444,8 +518,8 @@ router.post("/contribute", (req, res) => {
                                             })
                                     });
                             }
-                        }
-                    )
+                        })
+
                 })
         }
     })

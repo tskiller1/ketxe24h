@@ -79,7 +79,7 @@ app.use(function (err, req, res, next) {
   // res.end(err);
   // console.log(err)
   // return res.render('error');
-
+  console.log(err)
   return res.json(response.failure(404,"Not Found",{}))
 });
 
