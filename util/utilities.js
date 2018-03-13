@@ -30,7 +30,7 @@ function deg2rad(deg) {
 function onLocationChanged(socket, location) {
     var broadcast = location.toObject();
     delete broadcast.saves
-    socket.emit("location", broadcast);
+    socket.emit("location", JSON.stringify(broadcast));
 }
 
 module.exports = {
