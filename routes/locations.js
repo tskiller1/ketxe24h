@@ -262,7 +262,7 @@ router.get("/save", (req, res) => {
                         if (skip + locations.length != count) {
                             has_more_page = true;
                         }
-                        return res.json(response.successList({ locations: locations }, count, page, has_more_page))
+                        return res.json(response.successList(locations, count, page, has_more_page))
                     })
             })
             .catch(error => {
