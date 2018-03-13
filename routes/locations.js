@@ -110,6 +110,120 @@ router.get("/loadByDistance", (req, res) => {
     )
 })
 
+router.get("/favourite", (req, res) => {
+    if (!req.query.lat1 || !req.query.long1 || !req.query.distance) {
+        return res.json(response.failure(404, "Missing parameters"));
+    }
+    var lat1 = parseFloat(req.query.lat1);
+    var long1 = parseFloat(req.query.long1);
+    var distance = parseFloat(req.query.distance);
+    var point = {
+        type: "Point",
+        coordinates: [long1, lat1]
+    }
+
+    Locations.aggregate(
+        [
+            {
+                $geoNear: {
+                    near: point,
+                    spherical: true,
+                    distanceField: "distance",
+                    maxDistance: distance,
+                    query: { status: true }
+                }
+            },
+            {
+                $project: {
+                    __v: 0,
+                    saves: 0
+                }
+            }
+        ],
+        function (err, locations1) {
+            // do what you want with the results here
+            if (err) {
+                console.log(err)
+                return res.json(response.failure(500, err.message))
+            }
+            if (req.query.lat2 && req.query.long2) {
+                var lat2 = parseFloat(req.query.lat2);
+                var long2 = parseFloat(req.query.long2);
+                var point2 = {
+                    type: "Point",
+                    coordinates: [long2, lat2]
+                }
+                Locations.aggregate(
+                    [
+                        {
+                            $geoNear: {
+                                near: point2,
+                                spherical: true,
+                                distanceField: "distance",
+                                maxDistance: distance,
+                                query: { status: true }
+                            }
+                        },
+                        {
+                            $project: {
+                                __v: 0,
+                                saves: 0
+                            }
+                        }
+                    ],
+                    function (err, locations2) {
+                        // do what you want with the results here
+                        if (err) {
+                            return res.json(response.failure(500, err.message))
+                        }
+                        if (req.query.lat3 && req.query.long3) {
+                            var lat3 = parseFloat(req.query.lat3);
+                            var long3 = parseFloat(req.query.long3);
+                            var point3 = {
+                                type: "Point",
+                                coordinates: [long3, lat3]
+                            }
+                            Locations.aggregate(
+                                [
+                                    {
+                                        $geoNear: {
+                                            near: point3,
+                                            spherical: true,
+                                            distanceField: "distance",
+                                            maxDistance: distance,
+                                            query: { status: true }
+                                        }
+                                    },
+                                    {
+                                        $project: {
+                                            __v: 0,
+                                            saves: 0
+                                        }
+                                    }
+                                ],
+                                function (err, locations3) {
+                                    // do what you want with the results here
+                                    if (err) {
+                                        return res.json(response.failure(500, err.message))
+                                    }
+                                    var location = locations1.concat(locations2)
+                                    var result = location.concat(locations3)
+                                    return res.json(response.success(result))
+                                })
+                        }
+                        else {
+                            var location = locations1.concat(locations2)
+                            return res.json(response.success(location))
+                        }
+                        // return res.json(response.success(locations))
+                    })
+                // return res.json(response.success(locations))
+            }
+            else {
+                return res.json(response.success(locations1))
+            }
+        })
+})
 
 router.get("/save", (req, res) => {
     if (!req.query.token) {
@@ -449,6 +563,9 @@ router.post("/contribute", (req, res) => {
                                                         .catch(error => {
                                                             return res.json(response.failure(500, error.message))
                                                         })
+                                                })
+                                                .catch(error => {
+                                                    return res.json(response.failure(500, error.message))
                                                 });
                                         }
                                     }
@@ -516,6 +633,9 @@ router.post("/contribute", (req, res) => {
                                             .catch(error => {
                                                 return res.json(response.failure(500, error.message))
                                             })
+                                    })
+                                    .catch(err => {
+                                        return res.json(response.failure(500, err.message))
                                     });
                             }
                         })
