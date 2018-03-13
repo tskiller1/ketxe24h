@@ -176,6 +176,11 @@ router.get("/favourite", (req, res) => {
                         if (err) {
                             return res.json(response.failure(500, err.message))
                         }
+                        for (var i in locations2) {
+                            if (locations1.indexOf(i) === -1) {
+                                locations1.push(i)
+                            }
+                        }
                         if (req.query.lat3 && req.query.long3) {
                             var lat3 = parseFloat(req.query.lat3);
                             var long3 = parseFloat(req.query.long3);
@@ -206,14 +211,16 @@ router.get("/favourite", (req, res) => {
                                     if (err) {
                                         return res.json(response.failure(500, err.message))
                                     }
-                                    var location = locations1.concat(locations2)
-                                    var result = location.concat(locations3)
-                                    return res.json(response.success(result))
+                                    for (var j in locations3) {
+                                        if (locations1.indexOf(j) === -1) {
+                                            locations1.push(j)
+                                        }
+                                    }
+                                    return res.json(response.success(locations1))
                                 })
                         }
                         else {
-                            var location = locations1.concat(locations2)
-                            return res.json(response.success(location))
+                            return res.json(response.success(locations1))
                         }
                         // return res.json(response.success(locations))
                     })
