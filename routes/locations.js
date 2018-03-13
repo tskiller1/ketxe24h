@@ -178,8 +178,10 @@ router.get("/favourite", (req, res) => {
                         }
                         for (var i in locations2) {
                             var found = locations1.find(function (element) {
+                                // console.log(element._id + " " + locations2[i]._id)
                                 return element._id === locations2[i]._id;
                             });
+                            console.log(found)
                             if (found) {
                                 locations1.push(locations2[i])
                             }
