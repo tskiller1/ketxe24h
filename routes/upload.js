@@ -39,13 +39,14 @@ router.post("/image", (req, res) => {
         if (err) {
             return res.json(response.failure(405, "You do not have permission"))
         }
-        console.log(decode)
+        // console.log(decode)
         var user_id = decode._id;
         var upload = Multer({
             storage: storage
         }).single("file");
         upload(req, res, err => {
             if (err) {
+                console.log(err)
                 return res.json(response.failure(405, err.message))
             }
             try {
@@ -67,6 +68,7 @@ router.post("/image", (req, res) => {
                     user: decode._id
                 }))
             } catch (err) {
+                console.log(err)
                 return res.json(response.failure(405, err.message))
             }
         })
