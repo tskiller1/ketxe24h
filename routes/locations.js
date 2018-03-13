@@ -177,8 +177,8 @@ router.get("/favourite", (req, res) => {
                             return res.json(response.failure(500, err.message))
                         }
                         for (var i in locations2) {
-                            if (locations1.indexOf(i) === -1) {
-                                locations1.push(i)
+                            if (locations1.indexOf(locations2[i]) === -1) {
+                                locations1.push(locations2[i])
                             }
                         }
                         if (req.query.lat3 && req.query.long3) {
@@ -212,8 +212,8 @@ router.get("/favourite", (req, res) => {
                                         return res.json(response.failure(500, err.message))
                                     }
                                     for (var j in locations3) {
-                                        if (locations1.indexOf(j) === -1) {
-                                            locations1.push(j)
+                                        if (locations1.indexOf(locations3[j]) === -1) {
+                                            locations1.push(locations3[j])
                                         }
                                     }
                                     return res.json(response.success(locations1))
