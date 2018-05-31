@@ -348,6 +348,7 @@ router.get("/:id/share", (req, res) => {
     Locations
         .findOne({ _id: location_id })
         .then(location => {
+            console.log(location)
             api_info = {
                 dynamicLinkInfo: {
                     dynamicLinkDomain: "n3ga2.app.goo.gl",
