@@ -1,3 +1,4 @@
+var News = require("../models/News");
 var MAGIC_NUMBERS = {
     jpg: 'ffd8ffe0',
     jpg1: 'ffd8ffe1',
@@ -35,8 +36,54 @@ function onLocationChanged(socket, location) {
     socket.emit("location", JSON.stringify(broadcast));
 }
 
+function onNewChange(socket, _new) {
+    console.log("news" + _new);
+    socket.emit("new", _new);
+}
+
+function get2HoursAgo(locations) {
+    var result = [];
+    var start = new Date();
+    //get 2 hours ago
+    start.setHours(start.getHours() - 2, 0, 0, 0);
+    var end = new Date();
+    for (var i in locations) {
+        var dt = new Date(locations[i].last_modify);
+        if (dt > start && dt < end) {
+            result.push(locations[i]);
+        }
+    }
+    return result;
+}
+
+function getLevelLocation(news, req_level) {
+    var total = 0;
+    var count = 0;
+    var start = new Date();
+    start.setHours(start.getHours() - 2, 0, 0, 0);
+    console.log("date", start);
+    var end = new Date();
+    console.log("end", end);
+    for (var i in news) {
+        var dt = new Date(news[i].created_at);
+        console.log("dt", dt);
+        if (dt > start && dt < end) {
+            count++;
+            total += news[i].level;
+            console.log("found", news[i].level);
+        }
+    }
+    if (total != 0)
+        total = (total + req_level) / (count + 1);
+    else total = req_level;
+    return total;
+}
+
 module.exports = {
     onLocationChanged: onLocationChanged,
+    onNewChange: onNewChange,
+    get2HoursAgo: get2HoursAgo,
+    getLevelLocation: getLevelLocation,
     checkMagicNumbers: checkMagicNumbers,
     getDistance: getDistance,
     deg2rad: deg2rad,
