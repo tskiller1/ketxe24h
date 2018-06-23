@@ -23,6 +23,15 @@ const options = {
 };
 
 const geocoder = NodeGeocoder(options);
+router.get("/getTrafficLocation", function (req, res) {
+    Locations.find({ status: true })
+        .select({ saves: 0 })
+        .then(locations => {
+            return res.json(response.success(utilities.get2HoursAgo(locations)));
+        }).catch(err => {
+            return res.json(response.failure(500, err.message));
+        });
+});
 
 router.get("/", function (req, res) {
     var limit = 15;
