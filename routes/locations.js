@@ -16,6 +16,8 @@ var router = express.Router();
 
 const options = {
     provider: "google",
+    Country: "VNM",
+    language: "vi",
     // Optional depending on the providers
     httpAdapter: "https", // Default
     apiKey: config.api_key, // for Mapquest, OpenCage, Google Premier

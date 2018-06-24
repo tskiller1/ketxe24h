@@ -55,15 +55,14 @@ router.post("/like", (req, res) => {
                                         })
                                         .select({ __v: 0 })
                                         .then(newdoc => {
-                                            var obj = newdoc.toObject()
+                                            var obj = newdoc.toObject();
+                                            utilities.onNewChange(req.socketIO,JSON.stringify(obj));
                                             obj.is_like = true
                                             if (newdoc.dislikes.indexOf(user_id) !== -1) {
                                                 obj.is_dislike = true
                                             } else {
                                                 obj.is_dislike = false
                                             }
-                                            delete obj.likes;
-                                            delete obj.dislike;
                                             return res.json(response.success(obj))
                                         })
                                         .catch(err => {
@@ -88,15 +87,14 @@ router.post("/like", (req, res) => {
                                         })
                                         .select({ __v: 0})
                                         .then(newdoc => {
-                                            var obj = newdoc.toObject()
+                                            var obj = newdoc.toObject();
+                                            utilities.onNewChange(req.socketIO,JSON.stringify(obj));
                                             obj.is_like = false
                                             if (newdoc.dislikes.indexOf(user_id) !== -1) {
                                                 obj.is_dislike = true
                                             } else {
                                                 obj.is_dislike = false
                                             }
-                                            delete obj.likes;
-                                            delete obj.dislike;
                                             return res.json(response.success(obj))
                                         })
                                         .catch(err => {
@@ -154,15 +152,14 @@ router.post("/dislike", (req, res) => {
                                         })
                                         .select({ __v: 0})
                                         .then(newdoc => {
-                                            var obj = newdoc.toObject()
+                                            var obj = newdoc.toObject();
+                                            utilities.onNewChange(req.socketIO,JSON.stringify(obj));
                                             obj.is_dislike = true
                                             if (newdoc.likes.indexOf(user_id) !== -1) {
                                                 obj.is_like = true
                                             } else {
                                                 obj.is_like = false
                                             }
-                                            delete obj.likes;
-                                            delete obj.dislike;
                                             return res.json(response.success(obj))
                                         })
                                         .catch(err => {
@@ -187,15 +184,14 @@ router.post("/dislike", (req, res) => {
                                         })
                                         .select({ __v: 0})
                                         .then(newdoc => {
-                                            var obj = newdoc.toObject()
+                                            var obj = newdoc.toObject();
+                                            utilities.onNewChange(req.socketIO,JSON.stringify(obj));
                                             obj.is_dislike = false
                                             if (newdoc.likes.indexOf(user_id) !== -1) {
                                                 obj.is_like = true
                                             } else {
                                                 obj.is_like = false
                                             }
-                                            delete obj.likes;
-                                            delete obj.dislike;
                                             return res.json(response.success(obj))
                                         })
                                         .catch(err => {
