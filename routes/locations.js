@@ -59,14 +59,14 @@ router.get("/", function (req, res) {
     var skip = limit * (page - 1)
 
     Locations
-        .find({ status: true })
+        .find({})
         .select({ __v: 0, saves: 0 })
         .limit(limit)
         .skip(skip)
         .sort({ last_modify: -1 })
         .then(locations => {
             Locations
-                .count({ status: true }, (err, count) => {
+                .count({}, (err, count) => {
                     if (err) {
                         return res.json(response.failure(500, err.message))
                     }

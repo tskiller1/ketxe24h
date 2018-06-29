@@ -37,7 +37,7 @@ socketIO.on('connection', function (socket) {
   console.log('A client connection occurred!');
 });
 var task = cron.schedule('0 */2 * * *', function () {
-  console.log("is runing auto update");
+  console.log("is runing auto update",new Date().toISOString());
   Locations.find({ status: true })
     .then(locations => {
       var start = new Date();

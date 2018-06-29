@@ -238,7 +238,6 @@ router.get("/", (req, res) => {
     if (!req.query.token) {
         News
             .find({ location_id: location_id })
-            .select({ __v: 0, likes: 0, dislikes: 0 })
             .populate({
                 path: 'user_id',
                 select: 'total_news total_likes total_dislikes full_name'
@@ -299,8 +298,6 @@ router.get("/", (req, res) => {
                         } else {
                             newsList[i].is_dislike = false
                         }
-                        delete newsList[i].likes
-                        delete newsList[i].dislikes
                     }
                     News
                         .count({ location_id: location_id }, (err, count) => {
@@ -368,7 +365,6 @@ router.get("/:id", (req, res) => {
     else {
         News
             .find({ _id: id })
-            .select({ __v: 0, likes: 0, dislikes: 0 })
             .populate({
                 path: 'user_id',
                 select: 'total_news total_likes total_dislikes full_name'
