@@ -16,6 +16,8 @@ var router = express.Router();
 
 const options = {
     provider: "google",
+    Country: "VNM",
+    language: "vi",
     // Optional depending on the providers
     httpAdapter: "https", // Default
     apiKey: config.api_key, // for Mapquest, OpenCage, Google Premier
@@ -23,6 +25,15 @@ const options = {
 };
 
 const geocoder = NodeGeocoder(options);
+router.get("/getTrafficLocation", function (req, res) {
+    Locations.find({ status: true })
+        .select({ saves: 0 })
+        .then(locations => {
+            return res.json(response.success(utilities.get2HoursAgo(locations)));
+        }).catch(err => {
+            return res.json(response.failure(500, err.message));
+        });
+});
 
 router.get("/", function (req, res) {
     var limit = 15;
@@ -48,14 +59,14 @@ router.get("/", function (req, res) {
     var skip = limit * (page - 1)
 
     Locations
-        .find({ status: true })
+        .find({})
         .select({ __v: 0, saves: 0 })
         .limit(limit)
         .skip(skip)
         .sort({ last_modify: -1 })
         .then(locations => {
             Locations
-                .count({ status: true }, (err, count) => {
+                .count({}, (err, count) => {
                     if (err) {
                         return res.json(response.failure(500, err.message))
                     }
@@ -82,32 +93,30 @@ router.get("/loadByDistance", (req, res) => {
         type: "Point",
         coordinates: [longitude, latitude]
     }
-    Locations.aggregate(
-        [
-            {
-                $geoNear: {
-                    near: point,
-                    spherical: true,
-                    distanceField: "distance",
-                    maxDistance: distance,
-                    query: { status: true }
+    Locations
+        .aggregate(
+            [
+                {
+                    $geoNear: {
+                        near: point,
+                        spherical: true,
+                        distanceField: "distance",
+                        maxDistance: distance,
+                        query: { status: true }
+                    }
+                },
+                {
+                    $project: {
+                        __v: 0,
+                        saves: 0
+                    }
                 }
-            },
-            {
-                $project: {
-                    __v: 0,
-                    saves: 0
-                }
-            }
-        ],
-        function (err, locations) {
-            // do what you want with the results here
-            if (err) {
-                return res.json(response.failure(500, err.message))
-            }
-            return res.json(response.success(locations))
-        }
-    )
+            ]
+        ).then(locations => {
+            return res.json(response.success(utilities.get2HoursAgo(locations)));
+        }).catch(err => {
+            return res.json(response.failure(500, err.message))
+        });
 })
 
 router.get("/favourite", (req, res) => {
@@ -224,18 +233,16 @@ router.get("/favourite", (req, res) => {
                                             locations1.push(locations3[j])
                                         }
                                     }
-                                    return res.json(response.success(locations1))
+                                    return res.json(response.success(utilities.get2HoursAgo(locations1)))
                                 })
                         }
                         else {
-                            return res.json(response.success(locations1))
+                            return res.json(response.success(utilities.get2HoursAgo(locations1)))
                         }
-                        // return res.json(response.success(locations))
                     })
-                // return res.json(response.success(locations))
             }
             else {
-                return res.json(response.success(locations1))
+                return res.json(response.success(utilities.get2HoursAgo(locations1)))
             }
         })
 })
@@ -436,12 +443,12 @@ router.post("/contribute", (req, res) => {
                                         },
                                         {
                                             $lookup:
-                                                {
-                                                    from: "users",
-                                                    localField: "saves",
-                                                    foreignField: "_id",
-                                                    as: "saves"
-                                                }
+                                            {
+                                                from: "users",
+                                                localField: "saves",
+                                                foreignField: "_id",
+                                                as: "saves"
+                                            }
                                         }
                                     ],
                                     function (err, locations) {
@@ -470,53 +477,79 @@ router.post("/contribute", (req, res) => {
                                             var total_news = location.total_news + 1;
                                             var total_level = location.total_level + level;
                                             var average_rate = total_level / total_news;
-                                            Locations
-                                                .findOneAndUpdate({ _id: location._id }, {
-                                                    total_news: total_news,
-                                                    total_level: total_level,
-                                                    average_rate: average_rate,
-                                                    lastest_image: file,
-                                                    status: true,
-                                                    current_level: level,
-                                                    last_modify: created_at
-                                                }, { new: true })
-                                                .then(location => {
-                                                    let newNews = new News({
-                                                        user_id: userID,
-                                                        created_at: created_at,
-                                                        level: level,
-                                                        description: description,
-                                                        url_image: file,
-                                                        count_like: 0,
-                                                        count_dislike: 0,
-                                                        type: 1,
-                                                        location_id: location._id,
-                                                        likes: [],
-                                                        dislikes: []
-                                                    })
-                                                    newNews
-                                                        .save()
-                                                        .then(news => {
-                                                            utilities.onLocationChanged(req.socketIO, location)
-                                                            if (tokens.length > 0) {
-                                                                notification
-                                                                    .sendToDevice(tokens, payload)
-                                                                    .then(resp => {
-                                                                        console.log(resp)
+                                            var total = level;
+                                            News.find({ location_id: location._id })
+                                                .then(news => {
+                                                    total = utilities.getLevelLocation(news, level);
+                                                    console.log("onchange level", "req" + level + "---newlv" + total);
+                                                    Locations
+                                                        .findOneAndUpdate({ _id: location._id }, {
+                                                            total_news: total_news,
+                                                            total_level: total_level,
+                                                            average_rate: average_rate,
+                                                            lastest_image: file,
+                                                            status: true,
+                                                            current_level: total,
+                                                            last_modify: created_at
+                                                        }, { new: true })
+                                                        .then(location => {
+                                                            let newNews = new News({
+                                                                user_id: userID,
+                                                                created_at: created_at,
+                                                                level: level,
+                                                                description: description,
+                                                                url_image: file,
+                                                                count_like: 0,
+                                                                count_dislike: 0,
+                                                                type: 1,
+                                                                location_id: location._id,
+                                                                likes: [],
+                                                                dislikes: []
+                                                            })
+                                                            newNews
+                                                                .save()
+                                                                .then(news => {
+                                                                    utilities.onLocationChanged(req.socketIO, location);
+                                                                    console.log("newnew", newNews);
+                                                                    User.findOne({ _id: userID })
+                                                                        .select({ _id: 1, full_name: 1, total_news: 1, total_likes: 1, total_dislikes: 1 })
+                                                                        .then(user => {
+                                                                            if (user) {
+                                                                                news.user_id = user;
+
+                                                                            }
+                                                                            else {
+                                                                                news.user_id = { _id: userID, full_name: "anonymous" };
+                                                                            }
+                                                                            utilities.onNewChange(req.socketIO, news);
+                                                                        })
+                                                                        .catch(function (err) {
+                                                                            console.log("Error find user");
+                                                                        });
+                                                                    if (tokens.length > 0) {
+                                                                        notification
+                                                                            .sendToDevice(tokens, payload)
+                                                                            .then(resp => {
+                                                                                console.log(resp)
+                                                                                return res.json(response.success({}))
+                                                                            })
+                                                                            .catch(error => {
+                                                                                console.log(error.message)
+                                                                                return res.json(response.success({}))
+                                                                            })
+                                                                    } else {
                                                                         return res.json(response.success({}))
-                                                                    })
-                                                                    .catch(error => {
-                                                                        console.log(error.message)
-                                                                        return res.json(response.success({}))
-                                                                    })
-                                                            } else {
-                                                                return res.json(response.success({}))
-                                                            }
+                                                                    }
+                                                                })
+                                                                .catch(error => {
+                                                                    return res.json(response.failure(500, error.message))
+                                                                })
                                                         })
-                                                        .catch(error => {
-                                                            return res.json(response.failure(500, error.message))
-                                                        })
-                                                })
+                                                }).catch(err => {
+                                                    console.log("error new level" + err);
+                                                    total = level;
+                                                });
+
                                         } else {
                                             geocoder
                                                 .reverse({ lat: latitude, lon: longitude })
@@ -569,7 +602,22 @@ router.post("/contribute", (req, res) => {
                                                             newNews
                                                                 .save()
                                                                 .then(news => {
-                                                                    utilities.onLocationChanged(req.socketIO, location)
+                                                                    utilities.onLocationChanged(req.socketIO, location);
+                                                                    console.log("newnew", newNews);
+                                                                    User.findOne({ _id: userID })
+                                                                        .select({ _id: 1, full_name: 1, total_news: 1, total_likes: 1, total_dislikes: 1 })
+                                                                        .then(user => {
+                                                                            if (user) {
+                                                                                news.user_id = user;
+                                                                            }
+                                                                            else {
+                                                                                news.user_id = { _id: userID, full_name: "anonymous" };
+                                                                            }
+                                                                            utilities.onNewChange(req.socketIO, news);
+                                                                        })
+                                                                        .catch(function (err) {
+                                                                            console.log("Error find user");
+                                                                        });
                                                                     return res.json(response.success({}))
                                                                 })
                                                                 .catch(error => {
@@ -639,7 +687,23 @@ router.post("/contribute", (req, res) => {
                                                 newNews
                                                     .save()
                                                     .then(news => {
-                                                        utilities.onLocationChanged(req.socketIO, location)
+                                                        utilities.onLocationChanged(req.socketIO, location);
+
+                                                        console.log("newnew", newNews);
+                                                        User.findOne({ _id: userID })
+                                                            .select({ _id: 1, full_name: 1, total_news: 1, total_likes: 1, total_dislikes: 1 })
+                                                            .then(user => {
+                                                                if (user) {
+                                                                    news.user_id = user;
+                                                                }
+                                                                else {
+                                                                    news.user_id = { _id: userID, full_name: "anonymous" };
+                                                                }
+                                                                utilities.onNewChange(req.socketIO, news);
+                                                            })
+                                                            .catch(function (err) {
+                                                                console.log("Error find user");
+                                                            });
                                                         return res.json(response.success({}))
                                                     })
                                                     .catch(error => {
