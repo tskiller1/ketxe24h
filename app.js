@@ -35,6 +35,13 @@ admin.initializeApp({
 });
 socketIO.on('connection', function (socket) {
   console.log('A client connection occurred!');
+  socket.on('disconnect', function(){
+    console.log('user disconnected');
+  });
+  socket.on('error', function (err) {
+    if (err.description) throw err.description;
+    else throw err; // Or whatever you want to do
+  });
 });
 var task = cron.schedule('0 */2 * * *', function () {
   console.log("is runing auto update",new Date().toISOString());
