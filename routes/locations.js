@@ -71,7 +71,8 @@ router.get("/", function (req, res) {
                         return res.json(response.failure(500, err.message))
                     }
                     var has_more_page = false;
-                    if (skip + locations.length != count) {
+                    console.log(count)
+                    if (skip + locations.length < count) {
                         has_more_page = true;
                     }
                     return res.json(response.successList(locations, count, page, has_more_page))
