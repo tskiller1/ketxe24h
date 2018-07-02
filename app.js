@@ -16,6 +16,7 @@ var webhook = require('./routes/webhook');
 var user = require('./routes/user');
 var locations = require('./routes/locations');
 var upload = require('./routes/upload');
+var policy = require('./routes/policy');
 var news = require('./routes/news');
 var chart = require('./routes/chart');
 var uploadfornews = require('./routes/uploadfornews');
@@ -35,7 +36,7 @@ admin.initializeApp({
 });
 socketIO.on('connection', function (socket) {
   console.log('A client connection occurred!');
-  socket.on('disconnect', function(){
+  socket.on('disconnect', function () {
     console.log('user disconnected');
   });
   socket.on('error', function (err) {
@@ -44,7 +45,7 @@ socketIO.on('connection', function (socket) {
   });
 });
 var task = cron.schedule('0 */2 * * *', function () {
-  console.log("is runing auto update",new Date().toISOString());
+  console.log("is runing auto update", new Date().toISOString());
   Locations.find({ status: true })
     .then(locations => {
       var start = new Date();
@@ -52,7 +53,7 @@ var task = cron.schedule('0 */2 * * *', function () {
         var dt = new Date(locations[i].last_modify);
         hours = Math.floor(Math.abs(start - dt) / 36e5);
         if (hours >= 2) {
-          Locations.findOneAndUpdate({ _id: locations[i]._id }, { status: false,last_modify:start.toISOString() }, { new: true })
+          Locations.findOneAndUpdate({ _id: locations[i]._id }, { status: false, last_modify: start.toISOString() }, { new: true })
             .select({ saves: 0 })
             .then(loc => {
               //emit socket
@@ -92,6 +93,7 @@ app.use('/api/locations', locations)
 app.use('/api/upload', upload)
 app.use('/api/chart', chart)
 app.use('/api/news', news)
+app.use('/policy', policy);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
