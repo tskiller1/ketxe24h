@@ -22,7 +22,7 @@ router.post("/login", (req, res) => {
         .getUser(userID)
         .then(function (userRecord) {
             User
-                .findOne({ user_id: userID })
+                .findOneAndUpdate({ user_id: userID }, { fcm_token: fcm_token, device_id: deviceID })
                 .select({ __v: 0 })
                 .then(user => {
                     if (!user || user == null) {
