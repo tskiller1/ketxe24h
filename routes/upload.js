@@ -53,6 +53,7 @@ router.post("/image", (req, res) => {
                 var bitmap = fs
                     .readFileSync(__dirname + "/../public/images/" + req.file.filename)
                     .toString("hex", 0, 4);
+                console.log(__dirname)
                 if (!utilities.checkMagicNumbers(bitmap)) { //Kiểm tra xem file vừa lưu có phải là hình ảnh 
                     //nếu không thì xóa
                     try {
